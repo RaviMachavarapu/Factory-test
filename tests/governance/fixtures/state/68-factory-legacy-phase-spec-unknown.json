@@ -1,0 +1,23 @@
+{
+  "about": "The factory's own history: the legacy phase/spec (no slug) is an Unknown branch.",
+  "branch": {
+    "kind": "Unknown"
+  },
+  "branch_name": "phase/spec",
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "unknown-branch",
+    "step": {
+      "kind": "ExplainUnknown",
+      "why": "BranchUnknown"
+    },
+    "open_lanes": []
+  }
+}

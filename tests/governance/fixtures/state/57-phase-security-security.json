@@ -1,0 +1,21 @@
+{
+  "about": "State table, regulated phase/security: no docs derives security.",
+  "branch": {
+    "kind": "PhaseSecurity"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "security",
+    "phase": "security",
+    "step": {
+      "kind": "RunSecurityReview"
+    },
+    "open_lanes": []
+  }
+}

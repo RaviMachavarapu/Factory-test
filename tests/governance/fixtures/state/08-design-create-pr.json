@@ -1,0 +1,26 @@
+{
+  "about": "Precedence 5: the design lane complete with PR state known derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true,
+    "has_spec": true,
+    "has_plan": true,
+    "analyze_ok": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "about": "Pre (R5(e)): main has no branch PR; a PR on main is a ValueError.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": {
+    "number": 3,
+    "open": true,
+    "merged": false,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "none",
+    "mine": true
+  },
+  "open_lane_prs": [
+    {
+      "number": 3,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

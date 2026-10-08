@@ -1,0 +1,36 @@
+# SpecFlow stack pack metadata for `python` (REQ-303).
+stack: python
+guided_choice: 2
+guided_label: a web service or command-line tool
+guided_rationale: Python's stdlib-first toolchain (pytest, ruff, black) gives a fast, portable path for services and CLIs with no compiled runtime to install.
+guided_consequence: You get a web service or command-line tool, shipped as a container image you can run anywhere that runs containers.
+testing: pytest (tests/), ruff + black (lint and format), governance tests (tests/governance/)
+ci_runs_on: ubuntu-24.04
+source_roots: [src]
+test_globs: [tests/**/test_*.py]
+test_first_rules: ["src/** -> tests/**/test_*.py"]
+coverage_exclude: []
+lockfile: requirements.txt
+lockfiles: [requirements.txt, requirements-runtime.txt]
+floor_tools: [pip-audit, bandit]
+python_version: "3.12.15"
+ruff_version: 0.16.10
+black_version: 26.5.1
+pytest_version: 9.1.1
+pytest_cov_version: 7.1.0
+build_version: 1.6.1
+setuptools_version: 84.0.0
+wheel_version: 0.48.0
+pip_audit_version: 2.10.1
+bandit_version: 1.9.4
+prereqs: [build, pip_audit, bandit]
+verifier_deny: [./**/*.pem, ./**/*.key]
+check_build: python3 -c "import build"
+install_macos_build: pip install -r scripts/requirements.txt
+install_linux_build: pip install -r scripts/requirements.txt
+check_pip_audit: python3 -m pip_audit --version
+install_macos_pip_audit: pip install --require-hashes -r requirements.txt
+install_linux_pip_audit: pip install --require-hashes -r requirements.txt
+check_bandit: python3 -m bandit --version
+install_macos_bandit: pip install --require-hashes -r requirements.txt
+install_linux_bandit: pip install --require-hashes -r requirements.txt

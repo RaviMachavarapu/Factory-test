@@ -1,0 +1,24 @@
+{
+  "about": "Progress: SetFact(01's facts, brainstorm) derives specify, the next phase in the design lane's order.",
+  "lemma": "Fixture02",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "specify",
+    "step": {
+      "kind": "RunSpecify"
+    },
+    "open_lanes": []
+  }
+}

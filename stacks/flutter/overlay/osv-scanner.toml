@@ -1,0 +1,10 @@
+# osv-scanner config for a flutter-stack instance (REQ-303/304). The
+# security floor proper (installing osv-scanner and wiring it into
+# gates/CI, and per-finding suppressions each citing a SEC-NNN per
+# REQ-388) lands in P4 (REQ-330, REQ-331). Task 6 enumerates this list once,
+# at pin time, against the shipped pubspec.lock, so a first run's
+# osv-scanner against these pins is clean.
+#
+# Enumerated with osv-scanner 2.6.0 on 2026-09-25 against pubspec.lock sha256 b226649e… (Flutter 3.35.5) and, after the
+# 2026-10-04 re-pin to Flutter 3.47.6 (patch/pin-bump-2026-11), re-enumerated with osv-scanner 2.6.0 on 2026-10-04 against
+# pubspec.lock sha256 dee0f363ec0a266f12dad508d6ac099a4dfb82e9d980cac53b7e4033bf49b436 — no advisories found.

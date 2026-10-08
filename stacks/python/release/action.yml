@@ -1,0 +1,144 @@
+# python stack pack — the release action (REQ-351, REQ-390; P6 R20, R35). Installed by init as
+# .github/actions/release/action.yml and called by release.yml's image and prune jobs with fixed inputs.
+# Every input reaches a run: step through env: only; no secret is named; the image-build step is given no credential.
+# Every value a step writes to GITHUB_OUTPUT or passes on as a flag is checked first as a whole string — a digest is
+# "none" or sha256:<64 hex>, the image ghcr.io/<owner>/<repo> lower-cased — so no newline reaches GITHUB_OUTPUT.
+name: "SpecFlow python release parts"
+description: "The python image parts of a release: image-prior, image-build, image-publish and prune."
+inputs:
+  part:
+    description: "image-prior | image-build | image-publish | prune"
+    required: true
+  version:
+    description: "The release version"
+    required: false
+    default: ""
+  tag:
+    description: "The release tag (v<version>)"
+    required: false
+    default: ""
+  dist:
+    description: "The directory holding the release's files (the wheel; image.json is written here)"
+    required: false
+    default: ""
+  image:
+    description: "ghcr.io/<owner>/<repo>, lower-cased"
+    required: false
+    default: ""
+  source-url:
+    description: "https://github.com/<owner>/<repo>, the package's source label"
+    required: false
+    default: ""
+  prior:
+    description: "The digest the tag's existing Release records, or none"
+    required: false
+    default: "none"
+  superseded:
+    description: "The digest this run superseded, or none"
+    required: false
+    default: "none"
+  token:
+    description: "A read token for the existing Release (image-prior) or the package API (prune)"
+    required: false
+    default: ""
+  keychain:
+    description: "Unused by python (the app stacks' sign part); declared because release.yml's generic jobs pass it"
+    required: false
+    default: ""
+outputs:
+  prior:
+    description: "The digest the tag's existing Release records, or none"
+    value: ${{ steps.prior.outputs.prior }}
+  superseded:
+    description: "The digest this run superseded, or none"
+    value: ${{ steps.published.outputs.superseded }}
+runs:
+  using: "composite"
+  steps:
+    - name: Read the existing Release's image digest
+      id: prior
+      if: inputs.part == 'image-prior'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        TAG: ${{ inputs.tag }}
+        DIST: ${{ inputs.dist }}
+        IMAGE: ${{ inputs.image }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        prior="$(bash scripts/release-image.sh prior --image "$IMAGE" --version "$VERSION" --tag "$TAG" --out "$DIST/image.json")"
+        re='^(none|sha256:[0-9a-f]{64})$'
+        if ! [[ $prior =~ $re ]]; then
+          echo "::error::release action: image-prior printed neither none nor sha256:<64 hex>"
+          exit 1
+        fi
+        echo "prior=$prior" >> "$GITHUB_OUTPUT"
+
+    - name: Build the image and smoke it
+      if: inputs.part == 'image-build'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        TAG: ${{ inputs.tag }}
+        DIST: ${{ inputs.dist }}
+        IMAGE: ${{ inputs.image }}
+        SOURCE_URL: ${{ inputs.source-url }}
+        # The tagged commit for a tag push or a dispatch on a tag; release-image.sh refuses a checkout at any other.
+        RELEASE_COMMIT: ${{ github.sha }}
+      run: |
+        set -euo pipefail
+        bash scripts/release-image.sh build --image "$IMAGE" --version "$VERSION" --tag "$TAG" --out "$DIST/image.json" --source-url "$SOURCE_URL"
+
+    - name: Push the image, or reuse the published one
+      id: published
+      if: inputs.part == 'image-publish'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        TAG: ${{ inputs.tag }}
+        DIST: ${{ inputs.dist }}
+        IMAGE: ${{ inputs.image }}
+        SOURCE_URL: ${{ inputs.source-url }}
+        PRIOR: ${{ inputs.prior }}
+      run: |
+        set -euo pipefail
+        re='^(none|sha256:[0-9a-f]{64})$'
+        prior="${PRIOR:-none}"
+        if ! [[ $prior =~ $re ]]; then
+          echo "::error::release action: the prior input is neither none nor sha256:<64 hex>"
+          exit 1
+        fi
+        bash scripts/release-image.sh publish --image "$IMAGE" --version "$VERSION" --tag "$TAG" --out "$DIST/image.json" --source-url "$SOURCE_URL" --prior "$prior"
+        superseded="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["superseded"])' "$DIST/image.json")"
+        if ! [[ $superseded =~ $re ]]; then
+          echo "::error::release action: image.json's superseded is neither none nor sha256:<64 hex>"
+          exit 1
+        fi
+        echo "superseded=$superseded" >> "$GITHUB_OUTPUT"
+
+    - name: Delete the version this run superseded
+      if: inputs.part == 'prune'
+      shell: bash
+      env:
+        IMAGE: ${{ inputs.image }}
+        SUPERSEDED: ${{ inputs.superseded }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        re='^ghcr\.io/[a-z0-9._-]+/[a-z0-9._-]+$'
+        if ! [[ $IMAGE =~ $re ]]; then
+          echo "::error::release action: the image input is not ghcr.io/<owner>/<repo> lower-cased"
+          exit 1
+        fi
+        path="${IMAGE#ghcr.io/}"
+        bash scripts/release-ghcr-prune.sh --owner "${path%%/*}" --package "${path#*/}" --superseded "${SUPERSEDED:-none}"
+
+    - name: An unknown part fails
+      if: inputs.part != 'image-prior' && inputs.part != 'image-build' && inputs.part != 'image-publish' && inputs.part != 'prune'
+      shell: bash
+      env:
+        PART: ${{ inputs.part }}
+      run: |
+        echo "::error::release action: unknown part $PART for python (image-prior, image-build, image-publish, prune)"
+        exit 1

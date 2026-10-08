@@ -1,0 +1,22 @@
+{
+  "about": "State table: release docs present derive open-pr, CreatePr.",
+  "branch": {
+    "kind": "PhaseRelease"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_release_docs": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "release",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

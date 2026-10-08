@@ -1,0 +1,155 @@
+# REQ-384 (P6 R15, R18, R26): the PR-time build of the reproducible subset and its record. On every ship PR (head ship/<v> or
+# phase/release) and on workflow_dispatch, this builds the stack's reproducible artifacts from a fresh checkout of the PR head
+# (never the merge ref) and uploads them as release-dist-<version>; the manifest rows go to the job summary for /release to
+# transcribe. It reads no secret and holds no write permission. Not a required check: the comparison that blocks the ship PR
+# runs in the required `gates` check (verify-release.sh, R26). REQ-334: SHA-pinned actions, every value reaches run: via env.
+name: release-build
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, X.Y.Z (a dry run when docs/releases/<version>-notes.md does not exist)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# A PR's runs share one group (a new push cancels the older run); a dispatch's group names its version too, so two
+# dispatches of different versions on one ref never cancel each other.
+concurrency:
+  group: release-build-${{ github.event.pull_request.number || format('{0}-{1}', github.ref, inputs.version) }}
+  cancel-in-progress: true
+
+jobs:
+  release-build:
+    name: release-build
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'ship/') || github.head_ref == 'phase/release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The pack is read at the base (the PR's base branch; on a dispatch, the default branch), as instance-ness is, so a
+      # branch that adds or deletes .specflow.yml or .stack cannot swap the hook (P6 R2). fetch-depth: 0 already brings
+      # origin/<base>; nothing is fetched (persist-credentials: false leaves no credentials for a private repository).
+      # The base is the full refs/remotes/origin/<base>, never the short name: fetch-depth: 0 brings tags too, and a tag
+      # named origin/<base> outranks the remote-tracking ref in a short-name lookup, so whoever pushed one would choose the
+      # pack and the notes diff. The base= output carries the full ref to the version step.
+      # Each value is assigned before it is written, so a packinfo.py failure stops the step (set -e); a pack without
+      # python_version (packinfo.py prints it empty, exit 0) stops it too — setup-python given "" would use whatever
+      # Python is on PATH.
+      - name: Read the governing pack (python_version, stack)
+        id: pack
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          base="refs/remotes/origin/${BASE_REF:-$DEFAULT_BRANCH}"
+          if ! git rev-parse -q --verify "$base^{commit}" >/dev/null; then
+            echo "release-build: $base is not in the checkout" >&2
+            exit 1
+          fi
+          py="$(python3 scripts/lib/specflow/packinfo.py --root . --ref "$base" get python_version)"
+          stack="$(python3 scripts/lib/specflow/packinfo.py --root . --ref "$base" stack)"
+          if [ -z "$py" ]; then
+            echo "release-build: the governing pack at $base declares no python_version (packinfo.py get python_version printed nothing)" >&2
+            exit 1
+          fi
+          {
+            echo "base=$base"
+            echo "python_version=$py"
+            echo "release_stack=$stack"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ steps.pack.outputs.python_version }}
+
+      - name: Install Python dependencies
+        run: pip install --require-hashes -r scripts/requirements.txt
+
+      # The version is validated as a whole string ([[ =~ ]] anchors to the whole value, never line by line), before any
+      # use: a multi-line dispatch input never reaches GITHUB_OUTPUT, the artifact name or a path (R15).
+      - name: Resolve the version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE: ${{ steps.pack.outputs.base }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          v=""
+          if [ "$EVENT_NAME" = workflow_dispatch ]; then
+            v="$INPUT_VERSION"
+          elif [ "${HEAD_REF#ship/}" != "$HEAD_REF" ]; then
+            v="${HEAD_REF#ship/}"
+          else
+            names="$(git diff --name-only "$BASE...$HEAD_SHA" -- docs/releases)"
+            v="$(printf '%s\n' "$names" | sed -n 's|^docs/releases/\(.*\)-notes\.md$|\1|p')"
+            # one version's notes per release PR: more than one is refused, never the first taken silently
+            if [ "$(printf '%s\n' "$v" | grep -c .)" -gt 1 ]; then
+              echo "release-build: the PR changes more than one version's notes ($(printf '%s\n' "$v" | paste -sd ' ' -)); a release PR carries one version" >&2
+              exit 1
+            fi
+          fi
+          if ! [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            printf 'release-build: cannot resolve a version X.Y.Z (got %q)\n' "$v" >&2
+            exit 1
+          fi
+          if [ -f "docs/releases/$v-notes.md" ]; then
+            dry=false
+            epoch=""
+          else
+            dry=true
+            epoch="$(git log -1 --format=%ct "$HEAD_SHA")"
+          fi
+          {
+            echo "version=$v"
+            echo "dry_run=$dry"
+            if [ -n "$epoch" ]; then echo "epoch=$epoch"; fi
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build the reproducible subset
+        env:
+          RELEASE_PARTS: reproducible
+          VERSION: ${{ steps.version.outputs.version }}
+          STACK: ${{ steps.pack.outputs.release_stack }}
+          DRY_RUN: ${{ steps.version.outputs.dry_run }}
+          DRY_EPOCH: ${{ steps.version.outputs.epoch }}
+          RELEASE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          export DIST_DIR="$RUNNER_TEMP/dist"
+          if [ "$DRY_RUN" = true ]; then
+            export SOURCE_DATE_EPOCH="$DRY_EPOCH"
+            echo "dry run: no notes for $VERSION (the epoch is the head commit's committer date)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          bash "scripts/release-$STACK.sh"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-dist-${{ steps.version.outputs.version }}
+          path: ${{ runner.temp }}/dist
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Manifest rows (the reproducible artifacts)
+        run: |
+          set -euo pipefail
+          {
+            echo "### release-dist artifacts"
+            echo
+            echo "| file | sha256 | size |"
+            echo "|---|---|---|"
+            python3 scripts/lib/specflow/release_manifest.py rows --manifest "$RUNNER_TEMP/dist/manifest.json"
+          } >> "$GITHUB_STEP_SUMMARY"

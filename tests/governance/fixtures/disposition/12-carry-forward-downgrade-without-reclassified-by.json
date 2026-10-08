@@ -1,0 +1,41 @@
+{
+  "about": "A prior medium re-listed as low with no reclassified_by: rule 4's downgrade clause.",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "low",
+      "cvss_vector": "@low"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "accepted",
+      "owner": "",
+      "expiry": null,
+      "rationale": "",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "status": "accepted",
+      "expiry": "2026-10-27",
+      "version": "1.0.0"
+    }
+  ],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": false,
+    "violations": [
+      [
+        "SEC-001",
+        "carry_forward"
+      ]
+    ]
+  }
+}

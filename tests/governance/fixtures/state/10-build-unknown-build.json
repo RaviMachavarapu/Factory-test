@@ -1,0 +1,27 @@
+{
+  "about": "R5(f): build/<slug>-2 with only section 1 in the plan is unknown-build.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 2
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "unknown-build",
+    "step": {
+      "kind": "ExplainUnknown",
+      "why": "BuildUnknown"
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "rule": "a version bump plus a dependency_overrides: block: NOT exempt (non-version-line)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "pubspec.yaml"
+    ],
+    "contents": {
+      "pubspec.yaml": {
+        "base": "dependencies:\n  foo: ^1.0.0\n",
+        "head": "dependencies:\n  foo: ^1.0.1\n\ndependency_overrides:\n  foo:\n    path: ../foo\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

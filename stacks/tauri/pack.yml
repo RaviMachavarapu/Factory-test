@@ -1,0 +1,52 @@
+# SpecFlow stack pack metadata for `tauri` (REQ-303).
+stack: tauri
+guided_choice: 1
+guided_label: a Mac desktop app
+guided_rationale: Tauri builds a small native Mac app from a TypeScript web UI and a Rust core; v3.2 builds, tests and ships the macOS bundle only.
+guided_consequence: You get a Mac app you can hand to a tester, built and packaged as a macOS bundle.
+testing: vitest (src/**/*.test.ts), cargo test (src-tauri), governance tests (tests/governance/)
+ci_runs_on: macos-15
+python_version: "3.12"
+source_roots: [src, src-tauri/src]
+test_globs: [src/**/*.test.ts, src-tauri/tests/**]
+test_first_rules: ["src/**/*.ts -> src/**/*.test.ts", "src-tauri/src/**/*.rs -> src-tauri/tests/** | cfg-test"]
+coverage_exclude: [src-tauri/src/main.rs, src-tauri/src/lib.rs, src/main.ts]
+lockfile: package-lock.json
+lockfiles: [package-lock.json, src-tauri/Cargo.lock]
+floor_tools: [cargo-audit, npm-audit]
+create_tauri_app_version: 4.7.4
+create_tauri_app_integrity: sha512-7ZXpBxtl+eA3/ZFHWRbp+PpVxU78bpEqOJYa36Jw3mbgXq6GfsGAqDGtK5fEPHGtYwAjkFEDti4VHCauwEC4xg==
+create_tauri_app_darwin_arm64_integrity: sha512-/9EhGCcfTYI4go/dFGa8rBZulwqYhz6kqlRtFZOcZaECiChry8xMRuEuFe1C3XLFIPBb0BE2uthZVF86binYyA==
+tauri_cli_version: 2.12.1
+cargo_audit_version: 0.22.2
+cargo_llvm_cov_version: 0.9.1
+rust_version: 1.99.0
+node_version: 24.21.0
+vitest_version: 5.0.3
+vitest_coverage_version: 5.0.3
+macos_min: "10.13"
+macos_archs: arm64
+macos_host: "27.0 (Xcode 27, CocoaPods installed)"
+prereqs: [xcode_clt, rustup, rust_toolchain, node, cargo_audit, cargo_llvm_cov, llvm_tools]
+check_xcode_clt: xcode-select -p
+install_macos_xcode_clt: xcode-select --install
+install_linux_xcode_clt: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_rustup: rustup --version && cargo --version
+install_macos_rustup: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+install_linux_rustup: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_rust_toolchain: rustup toolchain list | grep -q '^1\.99\.0-'
+install_macos_rust_toolchain: rustup toolchain install 1.99.0 --profile minimal
+install_linux_rust_toolchain: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_node: node --version | grep -q '^v24\.' && npm --version
+install_macos_node: brew install node@24 && brew link --overwrite --force node@24
+install_linux_node: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_cargo_audit: cargo audit --version
+install_macos_cargo_audit: cargo install cargo-audit --locked --version 0.22.2
+install_linux_cargo_audit: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_cargo_llvm_cov: cargo llvm-cov --version
+install_macos_cargo_llvm_cov: cargo install cargo-llvm-cov --locked --version 0.9.1
+install_linux_cargo_llvm_cov: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_llvm_tools: rustup component list --toolchain 1.99.0 | grep -q '^llvm-tools.*(installed)'
+install_macos_llvm_tools: rustup component add llvm-tools --toolchain 1.99.0
+install_linux_llvm_tools: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+verifier_deny: [./**/*.p12, ./**/*.p8, ./**/*.key, ./**/*.mobileprovision]

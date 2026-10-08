@@ -1,0 +1,37 @@
+# Dependabot watches the hash-pinned Python lockfile under scripts/ (regenerating
+# requirements.txt with hashes via pip-compile) and every SHA-pinned `uses:` in
+# .github/workflows/ (bumping the pin and its version comment). It does not see
+# the pack composites' `uses:` lines under stacks/*/action.yml — those are not
+# under .github/workflows/ — so /retrospective proposes bumping them by hand
+# (REQ-334).
+#
+# Each ecosystem's updates arrive as one weekly PR (a group of every update).
+# Which check stops which bump. A workflow action bump touches .github/, which
+# the classifier's Dependabot exemption refuses: the verifier must attest it. A
+# pip bump that moves only scripts/requirements.txt passes the classifier's
+# content rule and is exempt from the verifier check; when it moves a gate
+# tool's pin (ruff, black, pytest, pytest-cov) the gates check stops it:
+# test_python_lockfiles.sh pins each to one version in scripts/requirements.txt
+# and stacks/python/skeleton/requirements.txt (folding it into the pack lockfile
+# moves stacks/python/pack.yml too: test_stack_packs.sh, test_coverage_floor.sh)
+# — a check enforce_admins: false lets an admin merge past. A bump of any other
+# pin (build, setuptools, wheel, a transitive dependency) passes both checks and
+# can merge exempt, unreviewed (threat-model dfe-13's residual). So the
+# maintainer folds a week's batch into one attested patch/<slug> PR and closes
+# the Dependabot PRs as superseded (the #43 precedent).
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/scripts"
+    schedule:
+      interval: weekly
+    groups:
+      pip-batch:
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions-batch:
+        patterns: ["*"]

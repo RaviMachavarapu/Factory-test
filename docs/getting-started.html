@@ -1,0 +1,323 @@
+<title>Factory Field Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one reading column (66ch) with a sticky chapter rail on wide screens; blueprint palette: ink on paper, copper for the reader's own actions. */
+  :root {
+    --bg: #f6f3ec;
+    --paper: #fffdf8;
+    --fg: #1f2630;
+    --muted: #5b6573;
+    --line: #d9d2c4;
+    --accent: #b5562a;
+    --accent-ink: #ffffff;
+    --you: #2f6f8f;
+    --you-soft: #e3eef4;
+    --claude-soft: #ece8dc;
+    --code-bg: #2b2f36;
+    --code-fg: #e9e6dd;
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --body: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171a1f; --paper: #1f232a; --fg: #ece8dd; --muted: #a6adb8; --line: #363c47;
+      --accent: #e08a5a; --accent-ink: #1a1410; --you: #7fb6d6; --you-soft: #22323c; --claude-soft: #2a2e36;
+      --code-bg: #0f1114; --code-fg: #e9e6dd; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171a1f; --paper: #1f232a; --fg: #ece8dd; --muted: #a6adb8; --line: #363c47;
+    --accent: #e08a5a; --accent-ink: #1a1410; --you: #7fb6d6; --you-soft: #22323c; --claude-soft: #2a2e36;
+    --code-bg: #0f1114; --code-fg: #e9e6dd; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.55; margin: 0; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-block: 32px 64px; padding-inline: 16px; }
+  header.hero { display: grid; gap: 14px; padding-block: 24px 36px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  .lede { font-size: 20px; max-width: 62ch; color: var(--muted); margin: 0; }
+  .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; padding-top: 28px; }
+  nav.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; display: grid; gap: 6px; font-size: 14px; }
+  nav.rail a { color: var(--muted); text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 10px; }
+  nav.rail a:hover, nav.rail a:focus-visible { color: var(--fg); border-left-color: var(--accent); outline: none; }
+  main { min-width: 0; display: grid; gap: 56px; }
+  section { display: grid; gap: 16px; scroll-margin-top: 24px; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.15; margin: 0; text-wrap: balance; }
+  h3 { font-family: var(--display); font-weight: 500; font-size: 21px; margin: 0; text-wrap: balance; }
+  p { margin: 0; max-width: 66ch; }
+  ul, ol { margin: 0; padding-left: 22px; max-width: 66ch; display: grid; gap: 8px; }
+  li { padding-left: 2px; }
+  a { color: var(--you); }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--claude-soft); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code-bg); color: var(--code-fg); font-family: var(--mono); font-size: 13.5px; line-height: 1.5; padding: 16px 18px; border-radius: 6px; overflow-x: auto; margin: 0; max-width: 100%; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 8px; min-width: 0; }
+  .card h3 { font-size: 18px; }
+  .card p { font-size: 15.5px; color: var(--muted); }
+  .you { border-left: 4px solid var(--you); background: var(--you-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; display: grid; gap: 6px; max-width: 72ch; }
+  .you .tag { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--you); }
+  .claude { border-left: 4px solid var(--line); background: var(--claude-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; display: grid; gap: 6px; max-width: 72ch; }
+  .claude .tag { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .steps { counter-reset: step; display: grid; gap: 18px; padding: 0; list-style: none; max-width: none; }
+  .steps > li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: start; }
+  .steps > li::before { counter-increment: step; content: counter(step); font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--accent); line-height: 1; padding-top: 2px; }
+  .steps .body { display: grid; gap: 10px; min-width: 0; }
+  .example { display: grid; gap: 10px; }
+  .annot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .annot .card p { color: var(--fg); }
+  .good { color: var(--you); font-weight: 600; }
+  .bad { color: var(--accent); font-weight: 600; }
+  .check { list-style: none; padding-left: 0; }
+  .check li { padding-left: 28px; position: relative; }
+  .check li::before { content: ""; position: absolute; left: 0; top: 6px; width: 14px; height: 14px; border: 2px solid var(--accent); border-radius: 3px; }
+  .note { font-size: 15px; color: var(--muted); max-width: 66ch; }
+  details { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); padding: 12px 16px; max-width: 72ch; }
+  summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 10px; }
+  dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; margin: 0; max-width: 72ch; }
+  dt { font-family: var(--mono); font-size: 14px; color: var(--accent); }
+  dd { margin: 0; }
+  footer { border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: 14px; }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; gap: 24px; }
+    nav.rail { position: static; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .annot { grid-template-columns: 1fr; }
+    dl { grid-template-columns: 1fr; gap: 4px 0; }
+    dd { margin-bottom: 8px; }
+    body { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">SpecFlow Factory · the template, read from the user's side</div>
+    <h1>From an idea to a signed release, with you deciding at seven points</h1>
+    <p class="lede">This repository turns a one-page idea into a tested, security-reviewed, released product. Claude does the writing and the building. You bring the idea, answer a handful of questions at each stage, run one command from a second terminal, and press merge. This guide shows what the idea must contain and exactly what you will be asked along the way.</p>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" aria-label="Chapters">
+      <a href="#roles">Who does what</a>
+      <a href="#setup">Before you start</a>
+      <a href="#idea">Writing the idea</a>
+      <a href="#journey">The journey</a>
+      <a href="#inputs">Your inputs, stage by stage</a>
+      <a href="#verifier">The second terminal</a>
+      <a href="#after">After the release</a>
+      <a href="#words">Words you will meet</a>
+    </nav>
+
+    <main>
+      <section id="roles">
+        <h2>Who does what</h2>
+        <p>Three parties work on every product. Knowing which is which makes the rest of this guide short.</p>
+        <div class="cards">
+          <div class="card">
+            <h3>You</h3>
+            <p>Own the idea and every decision about scope, risk and shipping. You never read a diff to decide. You confirm plain-English summaries, run the independent review from a second terminal, and merge.</p>
+          </div>
+          <div class="card">
+            <h3>Claude Code</h3>
+            <p>Writes the specification, the architecture, the plan, the tests, the code, the security review and the release notes, one lane at a time, and asks you only at the confirmation points below.</p>
+          </div>
+          <div class="card">
+            <h3>The pipeline</h3>
+            <p>Branches, pull requests and automated gates that refuse to merge work that lacks tests, a security review, or an independent review. One honest limit: in solo mode the independent review is an audit trail, not a lock. You are the repository's admin, so you can merge past a red check, and a free private repository enforces none of it server-side. The record of what was skipped is permanent either way.</p>
+          </div>
+        </div>
+        <p>The pipeline has two profiles. This guide describes the <strong>guided</strong> profile, the default for founders: Claude runs each step and pauses for your yes. The <strong>engineer</strong> profile prints the same steps for you to run yourself.</p>
+      </section>
+
+      <section id="setup">
+        <h2>Before you start</h2>
+        <p>Setup is three commands, run once in a fresh copy of this repository. If you are reading this inside a project that already has its own idea file and branches, setup has run and you can skip to the next chapter. The first command asks four things; the second pushes the result to GitHub; the third makes the review checks required on the main branch, which setup itself never does.</p>
+        <pre><code>bash scripts/init-project.sh --doctor    # report-only: what is missing on this machine
+bash scripts/init-project.sh             # the one-time setup: four prompts, then a local commit on main
+git push -u origin main                  # your empty GitHub repository, added as origin first
+bash scripts/configure-repo.sh           # requires the gates and verifier checks on main; on a free private
+                                         # repository it reports what GitHub refuses to enforce</code></pre>
+        <ol class="steps">
+          <li><div class="body"><h3>Your profile</h3><p>Press Enter for guided. Choose engineer only if you want to drive the commands yourself.</p></div></li>
+          <li><div class="body"><h3>Your project's name</h3><p>A plain product name, such as <code>Habit Tracker</code>. It names the repository's documents and, for a desktop app, the app itself.</p></div></li>
+          <li><div class="body"><h3>What are you building?</h3><p>A numbered menu. Each choice fixes the technology stack and what you will be able to hand out at the end.</p>
+            <div class="tablewrap"><table>
+              <thead><tr><th>Choice</th><th>What you get</th><th>Needs on your Mac</th></tr></thead>
+              <tbody>
+                <tr><td>a web service or command-line tool</td><td>A container image you can run anywhere that runs containers.</td><td>Python; the setup check lists the rest.</td></tr>
+                <tr><td>a Mac desktop app</td><td>A Mac app you can hand to a tester, built and packaged as a macOS bundle.</td><td>Rust, Node and the Xcode command-line tools.</td></tr>
+                <tr><td>a multi-platform app</td><td>The macOS build of an app that can later be extended to phones and other desktops.</td><td>Flutter and the Xcode command-line tools.</td></tr>
+              </tbody>
+            </table></div>
+          </div></li>
+          <li><div class="body"><h3>Working alone?</h3><p>Press Enter for solo. In solo mode the independent review is the automated verifier run you start from a second terminal; in team mode a second person also approves each pull request.</p></div></li>
+        </ol>
+        <div class="you"><span class="tag">What you need in place</span>
+          <ul>
+            <li>Claude Code installed and signed in, and the GitHub command-line tool <code>gh</code> signed in to the account that owns the repository.</li>
+            <li>An empty GitHub repository for the project. After setup you push to it and run the repository configuration yourself, as above. Public, or private on a paid plan, gets enforced branch protection; a free private repository gets the same checks as advice only.</li>
+            <li>The toolchain for your choice above; the setup check prints each missing piece with the command that installs it.</li>
+            <li>For a desktop app you later hand out: a second Mac to test the download on, and about two hours of CI minutes per release on a free plan.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="idea">
+        <h2>Writing the idea</h2>
+        <p>Your idea lives in one file, <code>IDEA.md</code>, with five headings. Everything Claude builds traces back to it, so the time you spend here is the highest-leverage time in the whole project. The file is the only place where you write prose; after it, you mostly answer questions.</p>
+
+        <div class="example">
+          <h3>A complete example: a macOS habit tracker</h3>
+          <p class="note">An example in the spirit of the walk the template's maintainers have planned for this same product. It is small on purpose. A good first idea is one you can describe in five short paragraphs.</p>
+          <pre><code># IDEA.md
+
+## Idea
+A macOS desktop app where I add a few daily habits, check each one off
+today, and see how many days in a row I have kept it up. Single user,
+one machine, no account.
+
+## Objective / Done Looks Like
+I open the app, see today's list, and check off "Walk 30 minutes". The
+streak counter next to it goes from 6 to 7. Tomorrow the checkbox is
+clear again and the streak is still 7 until I miss a day. I can hand the
+app to a friend as a download and they can do the same on their Mac.
+
+## Target Users
+Me, and people like me: one person who wants a light nudge, not a coach.
+They have five to ten habits, open the app once or twice a day, and will
+abandon it if adding a habit takes more than a few seconds.
+
+## Non-Goals (Explicit Out-of-Scope)
+No accounts, no sync between devices, no reminders or notifications, no
+sharing, no phone app, no charts beyond the streak number. Not a to-do
+list: habits repeat; tasks do not.
+
+## Constraints
+Mac desktop app. Data stays on the machine in a plain file I could read
+myself. The streak rule must be exactly right: a day counts only when
+checked before midnight local time. Free to build and run.</code></pre>
+        </div>
+
+        <h3>What each section must carry</h3>
+        <div class="annot">
+          <div class="card"><h3>Idea</h3><p>One paragraph, in the words you would use to a friend. Say what kind of thing it is (an app, a service, a tool), who uses it, and the one thing it does. <span class="bad">Too thin:</span> "A habit app." <span class="good">Enough:</span> the paragraph above.</p></div>
+          <div class="card"><h3>Objective / Done Looks Like</h3><p>Describe one concrete moment of use as if it already works, including what you see on screen. This becomes the acceptance test for the first release. <span class="bad">Too thin:</span> "Users can track habits." <span class="good">Enough:</span> a before-and-after a tester could reproduce.</p></div>
+          <div class="card"><h3>Target Users</h3><p>Who, how often, with what patience. If there are two kinds of user, name both; each becomes a persona in the specification. The details that matter are the ones that change a design decision: how many items, how often they open it, what makes them quit.</p></div>
+          <div class="card"><h3>Non-Goals</h3><p>The most valuable section for an AI builder. Everything you exclude here will not be designed, built, tested or reviewed, which keeps the first release small enough to finish. List what a reasonable person might assume you want and you do not.</p></div>
+          <div class="card"><h3>Constraints</h3><p>Platform, where data lives, anything that must integrate with an existing system, legal or privacy rules, budget, and any rule that must be exactly right. A rule you mark as critical can be formally proved during the build; name those plainly.</p></div>
+        </div>
+
+        <div class="you"><span class="tag">Checklist before you leave this file</span>
+          <ul class="check">
+            <li>Someone else could tell, from the Objective alone, whether the first release works.</li>
+            <li>Every exclusion a builder might otherwise assume is written under Non-Goals.</li>
+            <li>You have named where the data lives and who else can see it.</li>
+            <li>Any calculation or rule that must never be wrong is called out, so it can be proved rather than only tested.</li>
+            <li>Any outside service, account or API the product depends on is named, with whether you already have access.</li>
+            <li>The whole file still fits on one screen. If it does not, you have two ideas; keep one for a later lane.</li>
+          </ul>
+        </div>
+        <p class="note">You will not be asked to write the specification, the architecture or the plan. Claude writes those from this file and from your answers, and each is summarised back to you in plain English before it is committed.</p>
+      </section>
+
+      <section id="journey">
+        <h2>The journey: three lanes, one release</h2>
+        <p>Work moves through three kinds of branch, called lanes. Each lane ends in one pull request that the gates and the independent review must approve before you merge it. The command <code>/next</code> in Claude Code always knows which lane you are in and what comes next; in the guided profile it also runs the step for you.</p>
+        <div class="cards">
+          <div class="card"><h3>Design lane</h3><p>From your idea to a plan: a brainstorm you take part in, a specification, the architecture with its threat model, and a build plan split into numbered builds. One pull request.</p></div>
+          <div class="card"><h3>Build lanes</h3><p>One per numbered build in the plan. Tests are written before the code, critical rules are proved, and the pull request's own checks are the validation. Usually two to four builds for a first release.</p></div>
+          <div class="card"><h3>Ship lane</h3><p>The security review with every finding scored and dispositioned, then the release notes, migration notes and known limitations. One pull request, then the signed tag, then the published release.</p></div>
+        </div>
+        <h3>The seven moments the pipeline waits for you</h3>
+        <p>In the guided profile these are the only pauses. Each shows you what it names and continues only on your yes.</p>
+        <dl>
+          <dt>brainstorm end</dt><dd>A decision: the product scope Claude has drawn from your idea and your answers. Say yes to write the specification, or push back.</dd>
+          <dt>design PR</dt><dd>An acknowledgement: the specification summary, which rules will be formally proved, and the main risks. Your handle and the date are written into the documents as the confirmation.</dd>
+          <dt>build PR</dt><dd>An acknowledgement: what was built, in your terms, before the build's pull request is pushed.</dd>
+          <dt>ship PR</dt><dd>An acknowledgement, then a decision: the severity of every security finding and how each is handled, then go or no-go for the release.</dd>
+          <dt>awaiting verifier</dt><dd>Claude prints one command and waits. You run it in a second terminal. See the next chapter.</dd>
+          <dt>merge</dt><dd>A decision: Claude shows the merge command and asks before running it. Only an approved pull request ever reaches this point.</dd>
+          <dt>unsigned tag</dt><dd>An acknowledgement, only when no signing key exists on the machine: confirm that the release is tagged without a signature, which is recorded in the known limitations.</dd>
+        </dl>
+      </section>
+
+      <section id="inputs">
+        <h2>Your inputs, stage by stage</h2>
+        <p>The table reads top to bottom as the project unfolds. "Claude produces" is what gets written or built; "You provide" is the only thing the stage cannot proceed without.</p>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Stage</th><th>Claude produces</th><th>You provide</th><th>Typical wait</th></tr></thead>
+          <tbody>
+            <tr><td>Setup</td><td>The local repository with CI, gates and the stack's skeleton, committed on main.</td><td>Four answers at the prompts; the push to your GitHub repository; the configure-repo run.</td><td>Minutes.</td></tr>
+            <tr><td>Idea</td><td>Nothing yet.</td><td><code>IDEA.md</code>, five sections, one screen.</td><td>Your time: an hour done well.</td></tr>
+            <tr><td>Brainstorm</td><td>Questions about users, scope and the hard parts; a scope proposal.</td><td>Answers in plain language. Expect choices about what to leave out.</td><td>A conversation of 15 to 30 minutes.</td></tr>
+            <tr><td>Specify</td><td>The specification: personas, requirements with ids, what is proved, success metrics.</td><td>At most five clarifying questions, asked together; then the design-PR acknowledgement.</td><td>Claude works for a while; you answer once.</td></tr>
+            <tr><td>Architecture and plan</td><td>Decision records, the threat model, the build plan with tests described.</td><td>Nothing new; it is covered by the same design-PR acknowledgement.</td><td>Hours of Claude time, no input needed.</td></tr>
+            <tr><td>Design PR review</td><td>Fixes for the verifier's findings.</td><td>The verifier run from the second terminal; the merge.</td><td>Each run about 15 to 30 minutes; often one or two runs.</td></tr>
+            <tr><td>Each build</td><td>Tests, code, proofs, a pull request.</td><td>The build-PR acknowledgement, the verifier run, the merge.</td><td>Hours per build; your part is minutes.</td></tr>
+            <tr><td>Ship</td><td>The security review, dispositions, release notes, migration, known limitations.</td><td>Severity acknowledgements and go/no-go; the verifier run; the merge.</td><td>An hour of Claude time; a release-document review often takes a few verifier runs.</td></tr>
+            <tr><td>Tag</td><td>The signed tag and the published release, built twice in CI and compared.</td><td>One command from the repository; a signing key configured once.</td><td>The release workflow runs in a couple of minutes.</td></tr>
+            <tr><td>Hand out</td><td>Tester instructions beside the download, for an app without a developer signature.</td><td>A second Mac and ten minutes to follow them.</td><td>Your time.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="claude"><span class="tag">What you will never be asked</span>
+          <p>To read code or a diff, to write a test, to choose a library, to score a security finding from scratch, or to decide how a document is formatted. When the pipeline refuses something, Claude tells you what it refused and why, in your terms, and proposes the fix.</p>
+        </div>
+      </section>
+
+      <section id="verifier">
+        <h2>The second terminal</h2>
+        <p>Every pull request needs an independent review before it can merge. In solo mode that review is an automated verifier: a separate Claude run, started from outside your working session so it cannot be steered by it, that reads the pull request against the rules and posts an approval or a list of findings. The required check stays red without that approval; as the admin you could merge anyway, and the missing approval would stay on the record.</p>
+        <p>When Claude reaches the awaiting-verifier point it prints a line like this. You open a second terminal, go to the project, and run it.</p>
+        <pre><code>export GH_TOKEN="$(gh auth token)"
+cd ~/path/to/your-project
+git fetch origin
+git show refs/remotes/origin/main:scripts/run-verifier.sh | bash -s -- &lt;PR number&gt;</code></pre>
+        <div class="you"><span class="tag">What happens next</span>
+          <ul>
+            <li><strong>Approved:</strong> paste the output back to Claude. <code>/next</code> moves to the merge point and shows the merge command.</li>
+            <li><strong>Findings:</strong> paste them back. Claude folds the fixes in, re-reviews its own changes, pushes, and you run the command once more. One or two rounds is normal; release documents sometimes take more, because every finding there must be settled before the release is frozen.</li>
+            <li><strong>Never</strong> copy the command from a CI log page; use the line Claude printed. The printed line always runs the reviewed copy of the script from your main branch.</li>
+          </ul>
+        </div>
+        <p class="note">Run it only after the pull request's own checks have started; if your main branch has moved since the pull request was opened, the script says so and Claude rebases first. Each run uses your Claude subscription, not an API key.</p>
+      </section>
+
+      <section id="after">
+        <h2>After the release</h2>
+        <ul>
+          <li><strong>Handing it out.</strong> A desktop app without an Apple developer signature ships with generated tester instructions: the download, the "Open Anyway" steps, and how to remove the quarantine mark. With the five Apple signing secrets configured in the repository's release environment, the app is signed and notarized instead.</li>
+          <li><strong>The next idea.</strong> Edit <code>IDEA.md</code> or write a new one and start a new design lane. Requirement numbers continue from where the last specification stopped, so everything stays traceable across releases.</li>
+          <li><strong>Security findings you accepted.</strong> Each has an owner and an expiry date. The next release's review carries them forward and the gates refuse a release whose accepted findings have lapsed, so they are re-examined on a schedule rather than forgotten.</li>
+          <li><strong>Retrospectives.</strong> After each release, <code>/retrospective</code> records what worked, decides every open item in the backlog, and proposes changes. Proposals are applied by their own small pull requests.</li>
+          <li><strong>Template upgrades.</strong> A newer version of this template is taken on its own branch following the migration notes of that version; it is the one change that does not fit a lane yet.</li>
+        </ul>
+      </section>
+
+      <section id="words">
+        <h2>Words you will meet</h2>
+        <dl>
+          <dt>lane</dt><dd>A branch that carries several pipeline phases as one pull request: design, build or ship.</dd>
+          <dt>gates</dt><dd>The automated checks that run on every pull request: tests, test-first per commit, coverage, the security floor, formal proofs, document consistency.</dd>
+          <dt>verifier</dt><dd>The independent automated review of a pull request, run from a second terminal; its approval is required to merge.</dd>
+          <dt>confirmation point</dt><dd>One of the seven moments the guided profile pauses for your yes.</dd>
+          <dt>guided proposals</dt><dd>The section in a document where Claude records what it proposed and what you acknowledged, with your handle and the date.</dd>
+          <dt>verifiable rule</dt><dd>A requirement tagged to be formally proved with Dafny as well as tested; use it for the rule that must never be wrong.</dd>
+          <dt>security floor</dt><dd>The minimum scans every pull request passes: secrets, known-vulnerable dependencies, and the stack's own audit.</dd>
+          <dt>disposition</dt><dd>What was decided about each security finding: fixed, accepted with an owner and expiry, or deferred with a trigger. Critical and high findings are never accepted.</dd>
+          <dt>patch</dt><dd>A small change that does not warrant a full lane: one pull request, still with the gates and the verifier.</dd>
+        </dl>
+        <p class="note">The full glossary is <code>docs/GLOSSARY.md</code> in the repository; the twelve rules the pipeline enforces are in <code>constitution.md</code>; the branch names and the review rules are in <code>.claude/rules/review-gate.md</code>.</p>
+      </section>
+
+      <footer>Written for SpecFlow Factory v3.2. The example idea is illustrative; replace it with yours.</footer>
+    </main>
+  </div>
+</div>

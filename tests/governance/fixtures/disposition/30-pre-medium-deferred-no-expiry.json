@@ -1,0 +1,27 @@
+{
+  "about": "A deferred medium entry with no expiry: precondition violation.",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "deferred",
+      "owner": "alice",
+      "expiry": null,
+      "rationale": "tracked",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "error": "ValueError"
+  }
+}

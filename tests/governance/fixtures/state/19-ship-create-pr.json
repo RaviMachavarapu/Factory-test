@@ -1,0 +1,24 @@
+{
+  "about": "State table: security and release docs present derive open-pr, CreatePr.",
+  "branch": {
+    "kind": "Ship",
+    "version": "0.2.0"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_security_docs": true,
+    "has_release_docs": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "ship",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

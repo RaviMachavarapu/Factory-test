@@ -1,0 +1,26 @@
+{
+  "about": "Precedence 3: everything built with a next version proposes ship/<version> (lanes).",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "next_version": "0.2.0"
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "ready-to-ship",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeShip",
+        "version": "0.2.0"
+      }
+    },
+    "open_lanes": []
+  }
+}

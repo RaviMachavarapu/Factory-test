@@ -1,0 +1,29 @@
+{
+  "about": "R6: validate and security merged propose phase/release.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "next_version": "0.2.0",
+    "ship_phases_merged": [
+      "validate",
+      "security"
+    ]
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "ready-to-ship",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeRelease"
+      }
+    },
+    "open_lanes": []
+  }
+}

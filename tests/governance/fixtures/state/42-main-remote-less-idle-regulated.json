@@ -1,0 +1,23 @@
+{
+  "about": "REQ-393, RemoteLessMainIsIdle: main with no view of PRs on regulated is idle, phase/spec-<slug> first (PathClosure on regulated).",
+  "lemma": "Fixture42",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {},
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "idle",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeSpec"
+      }
+    },
+    "open_lanes": []
+  }
+}

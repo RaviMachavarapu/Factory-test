@@ -1,0 +1,23 @@
+{
+  "about": "REQ-393, RemoteLessMainIsIdle: main with no view of PRs on lanes is idle, design first.",
+  "lemma": "Fixture41",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {},
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "idle",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeDesign"
+      }
+    },
+    "open_lanes": []
+  }
+}

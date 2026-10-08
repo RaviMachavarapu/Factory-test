@@ -1,0 +1,22 @@
+{
+  "about": "State table: gates passing derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "PhaseValidate"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "gates_pass": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "validate",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

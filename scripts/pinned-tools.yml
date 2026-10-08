@@ -1,0 +1,25 @@
+# Pinned checksums for the security floor's release assets (REQ-330).
+#
+# Sources:
+#   - gitleaks_sha256_* is copied from that release's gitleaks_<version>_checksums.txt.
+#   - osv_scanner_sha256_* is copied from that release's osv-scanner_SHA256SUMS.
+#   - dafny_sha256_* is computed with `shasum -a 256` from the release asset itself —
+#     Dafny publishes no checksum file for its releases.
+#
+# /retrospective bumps these values (and the version numbers) when a floor tool or
+# Dafny is upgraded; see scripts/install-pinned-tool.sh for the installer that verifies
+# them on every run, cached or not.
+#
+# Flat key: value only (read via scripts/lib/specflow/config.py --file).
+gitleaks_version: 8.30.1
+gitleaks_sha256_darwin_arm64: b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5
+gitleaks_sha256_linux_x64: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+osv_scanner_version: 2.6.0
+osv_scanner_sha256_darwin_arm64: 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4
+osv_scanner_sha256_linux_amd64: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+dafny_version: 4.11.0
+# Since Dafny 4.10 the assets are dafny-<version>-x64-ubuntu-22.04.zip and dafny-<version>-arm64-macos-13.zip.
+# The x64-ubuntu value is the one ci.yml's and verifier.yml's Dafny steps check with sha256sum -c.
+# Both computed 2026-10-04 with shasum -a 256 over the downloaded v4.11.0 assets (equal to the GitHub API's asset digest).
+dafny_sha256_x64_ubuntu: a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179
+dafny_sha256_arm64_macos: c90c75e7d5db9c6ccbb7127840dfe43f0ac938b039a7ebed146d8ead383a572f

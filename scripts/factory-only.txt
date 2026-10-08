@@ -1,0 +1,26 @@
+# The factory's own design documents and proofs (REQ-306). scripts/init-project.sh removes every
+# match, then this file, from a new instance, so an instance's traceability, REQ numbering and
+# proofs are its own. One repository-relative glob per line (fnmatch over the relative paths of a
+# filesystem walk of the new tree, .git skipped); a trailing / is a directory prefix.
+# A path the CLAUDE.md "Canonical Example" manifest lists is never fenced. ADR-002 is not listed:
+# it defines the disposition gate every instance runs.
+docs/specs/2026-09-25-factory-v3-2-*.md
+docs/adr/003-pipeline-state-derivation.md
+docs/architecture/2026-09-25-factory-v3-2-*.md
+docs/plans/*-factory-v3-2-*-plan.md
+docs/reviews/*.md
+verification/factory_v3_2/
+# The factory's own release records (REQ-306), fenced like its spec and plans: instances keep docs/security/README.md,
+# RUBRIC.md and the demo's 0.0.1-demo records (the python example's), and docs/releases/README.md and the store checklist.
+docs/security/3.2.0-*.md
+docs/releases/3.2.0-*.md
+docs/security/3.2.1-*.md
+docs/releases/3.2.1-*.md
+# The factory's own retrospectives (REQ-371): dated docs/retrospectives/<YYYY-MM-DD>-<topic>.md decide the factory's BL ids;
+# instances keep docs/retrospectives/README.md and start their own backlog (templates/BACKLOG.md).
+docs/retrospectives/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*.md
+# A test outside tests/governance/ that cites a factory REQ: check-covers.sh rejects there a REQ no live spec defines.
+# scripts/render_dashboard.py ships to instances; its factory-REQ unit test does not.
+tests/unit/test_render_dashboard.py
+scripts/factory-only.txt
+docs/examples/README.md

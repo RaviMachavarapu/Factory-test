@@ -1,0 +1,15 @@
+# cargo-audit config for a tauri-stack instance (REQ-303/304), cargo-audit's
+# own schema. Each entry below cites a SEC-NNN in
+# docs/security/0.0.0-skeleton-disposition.md, which init copies into every
+# tauri instance (REQ-388); the instance's first /security-review carries
+# them forward.
+#
+# Enumerated with cargo-audit 0.22.2 on 2026-09-25 and re-enumerated on 2026-10-02 (yoke-derive 0.8.3 yanked -> 0.8.4;
+# 5871b662…); after the 2026-10-04 re-pin (patch/pin-bump-2026-11) re-enumerated with cargo-audit 0.22.2 on 2026-10-04 against src-tauri/Cargo.lock sha256 21b14f9e7b5adc3422fcb8eeb0dae5dabd7477d033d42d6f437ba9c4a21405c5
+# — SEC-003's five unic-* ids are gone (urlpattern 0.6.0 no longer pulls the family), so their ignores are dropped;
+# SEC-001 and SEC-002 remain and are renewed to 2027-03-24.
+[advisories]
+ignore = [
+  "RUSTSEC-2024-0370",  # SEC-002 reason: proc-macro-error, unmaintained; comes in via gtk3-macros, a Linux-only build of tauri's wry backend (webkit2gtk/gtk), never compiled on macOS; ignoreUntil: 2027-03-24
+  "RUSTSEC-2024-0429",  # SEC-001 reason: glib, unsound API (soundness bug in an old glib version); comes in via the gtk-rs GTK3 bindings, a Linux-only dependency of tauri's wry backend, not compiled for macOS; ignoreUntil: 2027-03-24
+]

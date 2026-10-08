@@ -1,0 +1,54 @@
+{
+  "about": "Precedence 3 and MainChecksOutLowestOwn (dfe-10): own #15 and #12 with another user's #9 checks out #12, listing all three.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [
+    {
+      "number": 15,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    },
+    {
+      "number": 9,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": false
+    },
+    {
+      "number": 12,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "awaiting-merge",
+    "step": {
+      "kind": "Checkout",
+      "pr": 12
+    },
+    "open_lanes": [
+      9,
+      12,
+      15
+    ]
+  }
+}

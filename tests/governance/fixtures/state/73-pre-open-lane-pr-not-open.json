@@ -1,0 +1,26 @@
+{
+  "about": "Pre: every open lane PR is open; a merged one in the list is a ValueError.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [
+    {
+      "number": 9,
+      "open": false,
+      "merged": true,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": false
+    }
+  ],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

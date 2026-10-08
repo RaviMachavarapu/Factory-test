@@ -1,0 +1,31 @@
+{
+  "rule": "an APPROVE marker whose recorded base gives the same merge base with the head as the PR's current base is accepted",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "alice",
+    "required_mode": "full",
+    "bases": {
+      "3333333333333333333333333333333333333333": true
+    }
+  },
+  "comments": [
+    {
+      "id": 1,
+      "user": {
+        "login": "alice"
+      },
+      "author_association": "OWNER",
+      "created_at": "2026-09-26T10:01:00Z",
+      "updated_at": "2026-09-26T10:01:00Z",
+      "html_url": "https://github.com/o/r/pull/7#issuecomment-1",
+      "body": "<!-- specflow-verifier:full sha:1111111111111111111111111111111111111111 base:3333333333333333333333333333333333333333 prompt_sha256:4444444444444444444444444444444444444444444444444444444444444444 model:opus verdict:APPROVE digest:1cbe7522926bd74f96b4cfdf97d2fa5ff1d8efc18a727ae3d0dea8f8c57b0b6b origin:headless -->\n## SpecFlow verifier (full mode)\n\nNo findings.\nAPPROVE"
+    }
+  ],
+  "expect": {
+    "state": "approve",
+    "reason": "accepted",
+    "comment_id": 1
+  }
+}

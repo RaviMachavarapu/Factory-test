@@ -1,0 +1,22 @@
+{
+  "about": "R21(a): phase/validate is a reused name; the wrapper dropped the previous cycle's merged PR, so branch_pr is null and the branch derives gates, never merged.",
+  "branch": {
+    "kind": "PhaseValidate"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_source_diff": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "validate",
+    "phase": "gates",
+    "step": {
+      "kind": "RunGates"
+    },
+    "open_lanes": []
+  }
+}

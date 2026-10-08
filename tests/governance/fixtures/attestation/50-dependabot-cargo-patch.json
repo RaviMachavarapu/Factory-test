@@ -1,0 +1,49 @@
+{
+  "rule": "a version bump plus a [patch.crates-io] git source: NOT exempt (non-version-change)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "src-tauri/Cargo.toml"
+    ],
+    "contents": {
+      "src-tauri/Cargo.toml": {
+        "base": "[dependencies]\nserde = \"1.0.0\"\n",
+        "head": "[dependencies]\nserde = \"1.0.1\"\n\n[patch.crates-io]\nserde = { git = \"https://example.invalid/serde\" }\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

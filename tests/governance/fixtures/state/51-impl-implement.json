@@ -1,0 +1,28 @@
+{
+  "about": "State table, regulated impl/plan-N-<name>: no source diff derives implement of PlanTarget(N, name).",
+  "branch": {
+    "kind": "Impl",
+    "plan": "3",
+    "name": "mechanized-gates"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "impl",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "PlanTarget",
+        "plan": "3",
+        "name": "mechanized-gates"
+      }
+    },
+    "open_lanes": []
+  }
+}

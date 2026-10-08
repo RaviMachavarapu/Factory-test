@@ -1,0 +1,54 @@
+{
+  "rule": "a source file changed alongside the lockfile is NOT a dependency file: not exempt",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "scripts/requirements.txt",
+      "src/app.py"
+    ],
+    "contents": {
+      "scripts/requirements.txt": {
+        "base": "pytest==9.1.0 \\\n    --hash=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+        "head": "pytest==9.1.1 \\\n    --hash=sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"
+      },
+      "src/app.py": {
+        "base": "print(1)\n",
+        "head": "print(2)\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

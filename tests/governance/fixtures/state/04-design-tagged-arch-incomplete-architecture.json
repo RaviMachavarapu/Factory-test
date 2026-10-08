@@ -1,0 +1,27 @@
+{
+  "about": "Precedence 4's exception (REQ-320): a spec with tagged REQs and incomplete architecture derives architecture even when a plan is present.",
+  "lemma": "Fixture04",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true,
+    "has_spec": true,
+    "spec_has_tagged_reqs": true,
+    "has_plan": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "architecture",
+    "step": {
+      "kind": "RunArchitecture"
+    },
+    "open_lanes": []
+  }
+}

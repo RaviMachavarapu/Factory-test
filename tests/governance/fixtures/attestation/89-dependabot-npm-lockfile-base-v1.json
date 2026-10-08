@@ -1,0 +1,49 @@
+{
+  "rule": "a base package-lock.json with no packages map (lockfileVersion 1) rewritten to v3 with a new node_modules/ entry: NOT exempt (content:<path>:base-lockfile-v1) — the growth check cannot run against it, so it fails closed",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "package-lock.json"
+    ],
+    "contents": {
+      "package-lock.json": {
+        "base": "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 1,\n  \"requires\": true,\n  \"dependencies\": {\n    \"lodash\": {\n      \"version\": \"4.17.20\",\n      \"resolved\": \"https://registry.npmjs.org/lodash/-/lodash-4.17.20.tgz\",\n      \"integrity\": \"sha512-a\"\n    }\n  }\n}\n",
+        "head": "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"app\",\n      \"dependencies\": {\n        \"lodash\": \"^4.17.0\",\n        \"evil\": \"^1.0.0\"\n      }\n    },\n    \"node_modules/lodash\": {\n      \"version\": \"4.17.21\",\n      \"resolved\": \"https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz\",\n      \"integrity\": \"sha512-b\",\n      \"dependencies\": {\n        \"evil\": \"^1.0.0\"\n      }\n    },\n    \"node_modules/evil\": {\n      \"version\": \"1.0.0\",\n      \"resolved\": \"https://registry.npmjs.org/evil/-/evil-1.0.0.tgz\",\n      \"integrity\": \"sha512-c\"\n    }\n  }\n}\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

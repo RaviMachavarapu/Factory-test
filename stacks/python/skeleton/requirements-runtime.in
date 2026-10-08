@@ -1,0 +1,4 @@
+# Runtime dependencies of this project, one per line (none yet). The image installs them wheels only
+# (--only-binary :all:): a dependency that ships no wheel for linux/amd64 or arm64 fails the image build.
+# After editing, regenerate the lock:
+#   uv pip compile --generate-hashes --universal --python-version 3.12 requirements-runtime.in -o requirements-runtime.txt

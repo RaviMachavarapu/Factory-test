@@ -1,0 +1,22 @@
+{
+  "about": "State table: security docs present derive open-pr, CreatePr.",
+  "branch": {
+    "kind": "PhaseSecurity"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_security_docs": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "security",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "about": "impl/sec-<id> with a source diff derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "ImplSec",
+    "id": "SEC-004"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_source_diff": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "impl",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

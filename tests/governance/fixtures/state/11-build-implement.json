@@ -1,0 +1,30 @@
+{
+  "about": "State table, lanes build/<slug>-N: no source diff derives implement of section N.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 1
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "Section",
+        "n": 1
+      }
+    },
+    "open_lanes": []
+  }
+}

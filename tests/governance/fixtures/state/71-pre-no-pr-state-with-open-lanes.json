@@ -1,0 +1,24 @@
+{
+  "about": "Pre (R5(h)): pr_state_known false with open lane PRs is a ValueError.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [
+    {
+      "number": 9,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": false
+    }
+  ],
+  "facts": {},
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

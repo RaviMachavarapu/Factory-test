@@ -1,0 +1,22 @@
+{
+  "about": "R5(d): an unrecognised branch is explained (BranchUnknown), with no step that changes anything.",
+  "branch": {
+    "kind": "Unknown"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "unknown-branch",
+    "step": {
+      "kind": "ExplainUnknown",
+      "why": "BranchUnknown"
+    },
+    "open_lanes": []
+  }
+}

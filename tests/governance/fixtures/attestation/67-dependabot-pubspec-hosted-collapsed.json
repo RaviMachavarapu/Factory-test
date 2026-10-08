@@ -1,0 +1,49 @@
+{
+  "rule": "a pubspec entry's hosted: private-registry source collapses to a plain version (the source moves to pub.dev): NOT exempt (source-changed)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "pubspec.yaml"
+    ],
+    "contents": {
+      "pubspec.yaml": {
+        "base": "name: app\ndependencies:\n  foo:\n    hosted: https://pub.private.example.invalid\n    version: ^1.0.0\n",
+        "head": "name: app\ndependencies:\n  foo: ^1.0.1\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

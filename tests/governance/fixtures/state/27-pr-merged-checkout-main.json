@@ -1,0 +1,34 @@
+{
+  "about": "Precedence 2: a merged PR sends the user back to main.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 1
+  },
+  "branch_pr": {
+    "number": 14,
+    "open": false,
+    "merged": true,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "approve",
+    "mine": true
+  },
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "merged",
+    "step": {
+      "kind": "CheckoutMain"
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "about": "Two review findings with the same id: precondition violation.",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "low",
+      "cvss_vector": "@low"
+    },
+    {
+      "id": "SEC-001",
+      "severity": "low",
+      "cvss_vector": "@low"
+    }
+  ],
+  "disposition": [],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "error": "ValueError"
+  }
+}

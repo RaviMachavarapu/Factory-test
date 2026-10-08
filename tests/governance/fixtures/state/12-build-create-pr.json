@@ -1,0 +1,27 @@
+{
+  "about": "State table: a source diff present derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 1
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ],
+    "has_source_diff": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

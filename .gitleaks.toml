@@ -1,0 +1,12 @@
+title = "specflow"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "The only paths REQ-388 permits without a SEC-NNN (threat model dfe-11); any further entry cites one."
+paths = [
+  '''(^|/)\.env\.example$''',
+  '''^docs/(.*/)?examples/''',
+  '''^tests/(.*/)?fixtures/''',
+]

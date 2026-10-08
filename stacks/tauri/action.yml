@@ -1,0 +1,89 @@
+# tauri stack pack — composite toolchain action (REQ-303).
+# Installs the pinned toolchain and the security floor tools for a
+# tauri-stack instance (REQ-330): gitleaks, osv-scanner, cargo-audit
+# (cargo install --locked --version), and a checksum-pinned macOS Dafny
+# when proofs are present.
+name: "SpecFlow tauri toolchain"
+description: "Set up Python, Node and Rust for a tauri-stack instance."
+inputs:
+  node_version:
+    description: "Node version to set up"
+    required: false
+    default: "24.21.0"
+  rust_version:
+    description: "Rust toolchain to install"
+    required: false
+    default: "1.99.0"
+  cargo_audit_version:
+    description: "cargo-audit version to install (--locked)"
+    required: false
+    default: "0.22.2"
+  cargo_llvm_cov_version:
+    description: "cargo-llvm-cov version to install (--locked), REQ-325"
+    required: false
+    default: "0.9.1"
+  cargo_workspaces:
+    description: "rust-cache workspaces argument"
+    required: false
+    default: "src-tauri -> target"
+  rust_cache:
+    description: "Whether to enable Swatinem/rust-cache (an instance's app-stacks.yml caches its own target directory and turns this off)"
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Cache the floor tool assets
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/specflow-tools
+        key: ${{ runner.os }}-specflow-tools-${{ hashFiles('scripts/pinned-tools.yml') }}
+    - name: Floor tools (gitleaks, osv-scanner)
+      shell: bash
+      run: |
+        bash scripts/install-pinned-tool.sh gitleaks osv-scanner --dest "$HOME/.local/specflow-bin"
+        echo "$HOME/.local/specflow-bin" >> "$GITHUB_PATH"
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: "3.12"
+    - name: Install gate dependencies
+      shell: bash
+      run: pip install --require-hashes -r scripts/requirements.txt
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: ${{ inputs.node_version }}
+        # v5+ caches automatically when package.json names npm as its packageManager; keep v4's no-cache behaviour.
+        package-manager-cache: false
+    - name: Install the pinned Rust toolchain
+      shell: bash
+      run: rustup toolchain install ${{ inputs.rust_version }} --profile minimal --component llvm-tools
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      if: inputs.rust_cache == 'true'
+      with:
+        workspaces: ${{ inputs.cargo_workspaces }}
+    - name: Cache cargo-audit
+      id: cargo-audit-cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cargo/bin/cargo-audit
+        key: ${{ runner.os }}-cargo-audit-${{ inputs.cargo_audit_version }}
+    - name: Install cargo-audit (cache miss)
+      if: steps.cargo-audit-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: cargo install cargo-audit --locked --version ${{ inputs.cargo_audit_version }}
+    - name: Cache cargo-llvm-cov
+      id: cargo-llvm-cov-cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cargo/bin/cargo-llvm-cov
+        key: ${{ runner.os }}-cargo-llvm-cov-${{ inputs.cargo_llvm_cov_version }}
+    - name: Install cargo-llvm-cov (cache miss)
+      if: steps.cargo-llvm-cov-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: cargo install cargo-llvm-cov --locked --version ${{ inputs.cargo_llvm_cov_version }}
+    - name: Install Dafny (if proofs are present)
+      if: hashFiles('verification/**/*.dfy') != ''
+      shell: bash
+      run: |
+        bash scripts/install-pinned-tool.sh dafny --dest "$RUNNER_TEMP/dafny-dist"
+        echo "$RUNNER_TEMP/dafny-dist/dafny" >> "$GITHUB_PATH"

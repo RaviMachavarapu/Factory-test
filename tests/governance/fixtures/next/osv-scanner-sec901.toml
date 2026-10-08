@@ -1,0 +1,4 @@
+[[IgnoredVulns]]
+id = "GHSA-aaaa-bbbb-cccc"
+ignoreUntil = 2099-01-01
+reason = "SEC-901: fixture, a suppression added on the ship branch"

@@ -1,0 +1,23 @@
+{
+  "about": "patch/<slug> with a source diff derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "Patch",
+    "slug": "typo-fix"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_source_diff": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

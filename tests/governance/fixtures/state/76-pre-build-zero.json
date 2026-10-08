@@ -1,0 +1,21 @@
+{
+  "about": "Pre: a Build branch has n >= 1.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 0
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "about": "Precedence 3: unbuilt sections propose the lowest (slug, n) as build/<slug>-N.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "unbuilt": [
+      [
+        "a",
+        2
+      ],
+      [
+        "b",
+        1
+      ]
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "next-build",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeBuild",
+        "slug": "a",
+        "n": 2
+      }
+    },
+    "open_lanes": []
+  }
+}

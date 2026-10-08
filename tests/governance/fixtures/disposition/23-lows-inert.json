@@ -1,0 +1,131 @@
+{
+  "about": "Fixture 07 plus an accepted low with a fresh id: the same violations (R10, lows inert for rules 2-5).",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-002",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-003",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-004",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-005",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-006",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    },
+    {
+      "id": "SEC-007",
+      "severity": "low",
+      "cvss_vector": "@low"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-002",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-003",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-004",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-005",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-006",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-10-27",
+      "rationale": "tracked",
+      "reclassified_by": null
+    },
+    {
+      "id": "SEC-007",
+      "status": "accepted",
+      "owner": "",
+      "expiry": null,
+      "rationale": "",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": false,
+    "violations": [
+      [
+        "SEC-001",
+        "medium_cap"
+      ],
+      [
+        "SEC-002",
+        "medium_cap"
+      ],
+      [
+        "SEC-003",
+        "medium_cap"
+      ],
+      [
+        "SEC-004",
+        "medium_cap"
+      ],
+      [
+        "SEC-005",
+        "medium_cap"
+      ],
+      [
+        "SEC-006",
+        "medium_cap"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "about": "State table, regulated phase/plan-<slug>: no plan derives plan.",
+  "branch": {
+    "kind": "PhasePlan",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "plan",
+    "phase": "plan",
+    "step": {
+      "kind": "RunPlan"
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "about": "Precedence 1: an open PR with no marker is awaiting-verifier, whatever the facts (PrPrecedence witness).",
+  "lemma": "Fixture20",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 1
+  },
+  "branch_pr": {
+    "number": 12,
+    "open": true,
+    "merged": false,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "none",
+    "mine": true
+  },
+  "open_lane_prs": [
+    {
+      "number": 12,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ],
+    "has_source_diff": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "awaiting-verifier",
+    "step": {
+      "kind": "RunVerifier",
+      "pr": 12
+    },
+    "open_lanes": [
+      12
+    ]
+  }
+}

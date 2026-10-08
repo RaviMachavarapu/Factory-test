@@ -1,0 +1,23 @@
+{
+  "about": "State table: security docs present derive release.",
+  "branch": {
+    "kind": "Ship",
+    "version": "0.2.0"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_security_docs": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "ship",
+    "phase": "release",
+    "step": {
+      "kind": "RunRelease"
+    },
+    "open_lanes": []
+  }
+}

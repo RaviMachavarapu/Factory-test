@@ -1,0 +1,49 @@
+{
+  "rule": "a pin moves with new --hash lines, the base's --index-url and the other pins' hashes kept: exempt",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "scripts/requirements.txt"
+    ],
+    "contents": {
+      "scripts/requirements.txt": {
+        "base": "--index-url https://pypi.private.example.invalid/simple\npluggy==1.6.0 \\\n    --hash=sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n    # via pytest\npytest==9.1.0 \\\n    --hash=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n    # via -r requirements.in\n",
+        "head": "--index-url https://pypi.private.example.invalid/simple\npluggy==1.6.0 \\\n    --hash=sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\n    # via pytest\npytest==9.1.1 \\\n    --hash=sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \\\n    --hash=sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n    # via -r requirements.in\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "approve",
+    "reason": "exempt-dependabot",
+    "comment_id": null
+  }
+}

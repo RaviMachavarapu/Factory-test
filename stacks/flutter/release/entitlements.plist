@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- REQ-352 (P6 R33): the fallback entitlements for the Flutter app's hardened-runtime signature. release-sign.sh signs
+     with the project's own macos/Runner/Release.entitlements (the file the release build is made with, which keeps
+     the app sandbox the generator turns on) and uses this file only when the project has none, so the signed app is
+     never less sandboxed than the unsigned build of the same tag. A release build is AOT-compiled, so the Dart VM needs
+     no JIT entitlement. A notarized app must not carry the debugger entitlement (get-task-allow): release-sign.sh
+     removes it from the committed file it signs with. The set the unsigned app embeds is compared with the committed
+     set, never signed in (REQ-386, P7 R7). -->
+<plist version="1.0">
+<dict/>
+</plist>

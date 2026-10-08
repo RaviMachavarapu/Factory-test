@@ -1,0 +1,13 @@
+{
+  "about": "Zero findings, zero entries, no due prior entry: passes (the model's ZeroFindingsPass corollary).",
+  "review": [],
+  "disposition": [],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": true,
+    "violations": []
+  }
+}

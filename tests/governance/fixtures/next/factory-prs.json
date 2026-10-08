@@ -1,0 +1,953 @@
+{
+ "source": {
+  "command": "GH_TOKEN=\"$(gh auth token --user kpingali123)\" gh pr list --repo Apps-Consultants/factory --state all --limit 1000 --json number,headRefName,baseRefName,state,author,mergedAt,mergeCommit,reviewDecision,isDraft,headRefOid,url",
+  "captured": "2026-09-28",
+  "note": "PRs #1–#46 only; bodies emptied"
+ },
+ "prs": [
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "main",
+   "headRefOid": "ec7a2d935604ee3adf54a901773eec6e856c1d56",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 1,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/1",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "phase/spec",
+   "headRefOid": "276bc0b1b2f0f71ff854190151ccaffb6dfaa135",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "f398ccc55a1de8842223c10545a89ac91525a686"
+   },
+   "mergedAt": "2026-05-28T00:21:34Z",
+   "number": 2,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/2",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "phase/spec",
+   "headRefOid": "f261fb3ad36cb790108f79d32b10f51591c01b57",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "d5aa9d782140f144c9959d7ac6b99a7cb46f918f"
+   },
+   "mergedAt": "2026-05-28T02:21:32Z",
+   "number": 3,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/3",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "phase/spec-v3.1",
+   "headRefOid": "f3d6a4c144942be2c91250bd9b3250e9d31e441b",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "2f315ad5061996bd90fbaa1fe84d6683dcefae12"
+   },
+   "mergedAt": "2026-05-28T18:59:08Z",
+   "number": 4,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/4",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "impl/plan-1-foundation",
+   "headRefOid": "93471d9e533beb14ae72b009b0ca68ac87863477",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "ba941af58c6a546aeb050906816d7f02f13c543f"
+   },
+   "mergedAt": "2026-05-28T18:59:44Z",
+   "number": 5,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/5",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "impl/plan-2-tooling",
+   "headRefOid": "79d3ddd83c8c818b830ab92800e1985a4698fd11",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "b53481a6447834fb86350d5d07e52ab975bb8a8e"
+   },
+   "mergedAt": "2026-05-28T19:00:28Z",
+   "number": 6,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/6",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "impl/plan-3-demo",
+   "headRefOid": "51c30493dab12ab80e3e504977d19729769a1155",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "792cecbca34316a574c37b7391696940d5d417d7"
+   },
+   "mergedAt": "2026-05-28T19:02:02Z",
+   "number": 7,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/7",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/retro-2026-05-28",
+   "headRefOid": "9376b2ae8b246e5095186103c377a57b4995eb36",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "e57b77f1d537a8b49d7a47eb45b12f403fe1758f"
+   },
+   "mergedAt": "2026-06-10T03:12:43Z",
+   "number": 8,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/8",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "baseline",
+   "headRefName": "impl/fix-p0-ci-enforcement",
+   "headRefOid": "eeb3125b67b71a78ae78f85283cb79a03be000b0",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "5b08cb7a7fa39312f0ae96415a660c45784f6294"
+   },
+   "mergedAt": "2026-06-09T23:48:40Z",
+   "number": 9,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/9",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/p1-adoption-path",
+   "headRefOid": "9ec32c8a83f4e76b5dc62c9f992d3349bfd13e2b",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "d5717758cc134416d58e6f2b644f89f2e1a37196"
+   },
+   "mergedAt": "2026-06-10T03:09:08Z",
+   "number": 10,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/10",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/p2-amendments",
+   "headRefOid": "6232195599df3759a056eae4020ccc1695b080d5",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "63987432672677a03a6fbdb815cdc80e2bd64294"
+   },
+   "mergedAt": "2026-06-10T03:10:52Z",
+   "number": 11,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/11",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/p3-traceability",
+   "headRefOid": "1efc1b72b167a9cfe4d21706e8f6ce8e8be42712",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "37d946caa8e5be8dea679ef945aea17a53203be3"
+   },
+   "mergedAt": "2026-06-10T03:11:39Z",
+   "number": 12,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/12",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/retro-2026-06-09",
+   "headRefOid": "deafd0983d54831a81d449ac23c619261258373b",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "16ab2b3440331c64c168b3173b4984b0f30a08b3"
+   },
+   "mergedAt": "2026-06-10T03:36:25Z",
+   "number": 13,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/13",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/template-cleanup",
+   "headRefOid": "02677f8cdf48a98a25a46d83bdf0d1c7cf4d5b87",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "2abb573eb942f33136899448d77ff555b0837735"
+   },
+   "mergedAt": "2026-06-20T15:12:19Z",
+   "number": 14,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/14",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/template-instantiation-fixes",
+   "headRefOid": "8f19f21b15a950bc4f50d73015dd1e48949292a7",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "7992d558571558b789a7697fd3f63b47d5102895"
+   },
+   "mergedAt": "2026-06-20T19:56:20Z",
+   "number": 15,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/15",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/templatize-readme-title",
+   "headRefOid": "382285550ecc2f3c477bd0529916978a5183652c",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "21c50e758bc077b99eafc9f2ee74e5b67a9cbe46"
+   },
+   "mergedAt": "2026-06-20T20:15:04Z",
+   "number": 16,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/16",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/readme-quickstart-instances",
+   "headRefOid": "dd0191c3b9a71c17f40972561db051da560c8f4a",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "ba4eff77b7ce8b1e0ff6502d0194b44a53000101"
+   },
+   "mergedAt": "2026-06-20T20:24:07Z",
+   "number": 17,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/17",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/python-lint-clean",
+   "headRefOid": "97ede4f4df7b08291523a79f57b8f933619443cf",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "aa35ef0a8c6e64f11baf9aa94f16fca2de8a0b90"
+   },
+   "mergedAt": "2026-06-20T21:41:41Z",
+   "number": 18,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/18",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/review-2026-09-25-template-objective",
+   "headRefOid": "8c8a67fab449968a85cc0cf271e70a3dac1f6d7f",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "7a44025fd7df0ffda4ea149227411215f8b75744"
+   },
+   "mergedAt": "2026-09-25T22:22:07Z",
+   "number": 19,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/19",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/spec-factory-v3-2",
+   "headRefOid": "a4d961cb447c0f82cfa2796c39e25aa6f4496e71",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "b69e71b867de947ce29bea4a0bf20f03c73f37b4"
+   },
+   "mergedAt": "2026-09-25T22:22:11Z",
+   "number": 20,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/20",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "phase/spec-factory-v3-2",
+   "headRefName": "impl/plan-0-plan-scoping",
+   "headRefOid": "7dc38ec519f97e3205106adf59a2822d4ac3ea09",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 21,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/21",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-0-plan-scoping",
+   "headRefOid": "b51ca4c6a7ea8ca2f49daa2dfcb8d437e3323452",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "4348b084d46ca99e4967441cfc5f572b1573ab58"
+   },
+   "mergedAt": "2026-09-25T22:39:47Z",
+   "number": 22,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/22",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/arch-factory-v3-2",
+   "headRefOid": "21b4393ffeed66e2ee02af3dbb7b0e09207f4fed",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "54aba3da30bb418688bd8b833fbdc2ef6ab9a5d2"
+   },
+   "mergedAt": "2026-09-25T23:11:53Z",
+   "number": 23,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/23",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/arch-factory-v3-2-fixes",
+   "headRefOid": "55649742fd91be5592de9b5c446c00701dd4ec32",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "b7f959bf313010befbe213bde701f2b74175e702"
+   },
+   "mergedAt": "2026-09-25T23:36:13Z",
+   "number": 24,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/24",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-1a-first-run",
+   "headRefOid": "1297584cae709cab5a7a485f217ea186870c1c4b",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "d17106ec2079164851254e36396597ecf460e1d8"
+   },
+   "mergedAt": "2026-09-26T02:35:48Z",
+   "number": 25,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/25",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/plan-factory-v3-2-p1a",
+   "headRefOid": "17e0e174a8319d6e7d3250429d7af31744752ece",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "b34266635d747ec437b8a2c42ab9b0e23c19b9cf"
+   },
+   "mergedAt": "2026-09-26T02:33:39Z",
+   "number": 26,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/26",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/hygiene-test-tracked-files",
+   "headRefOid": "0cda992a02a703db30a9a516cde4131edfae6c91",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "eb0bee085cc3c1d9e2e08bea33da555eff65e092"
+   },
+   "mergedAt": "2026-09-26T15:08:21Z",
+   "number": 27,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/27",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "chore/p1a-review-fixes",
+   "headRefOid": "15b7fbdb683d469c2a8aa0583363e76169f3fdc7",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "e98fe1b785461d61c79228ca7d3326cd95fb8cf2"
+   },
+   "mergedAt": "2026-09-26T15:08:44Z",
+   "number": 28,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/28",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/plan-factory-v3-2-p1b",
+   "headRefOid": "f0e224b35f396d7adebba9460c4baae08bdd0002",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "f6e9999ec36724020de43f0b331a04e05413d452"
+   },
+   "mergedAt": "2026-09-26T15:08:55Z",
+   "number": 29,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/29",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-1b-app-packs",
+   "headRefOid": "6bbba789f33fb8e2b975b4e0cab0c3554ad28ee1",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "404eb1e7726d6761c9b014898557e36a5bc9a652"
+   },
+   "mergedAt": "2026-09-26T15:09:10Z",
+   "number": 30,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/30",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "MDQ6VXNlcjcyNDI1ODg=",
+    "is_bot": false,
+    "login": "apingali",
+    "name": "Ashwin Pingali"
+   },
+   "baseRefName": "main",
+   "headRefName": "patch/p1a-mediums",
+   "headRefOid": "b44bb26cf7c241e54e74adb23fb745b0a1bb5066",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "50865d8b5e30f84d61a154aa457ddbc2fe705fa3"
+   },
+   "mergedAt": "2026-09-26T15:09:25Z",
+   "number": 31,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/31",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/plan-factory-v3-2-p2",
+   "headRefOid": "01b9939a1183d6433f39922e90d5796c554616cd",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "3f6878f18f8ad64e80fdb356ea5d81caaf69bfbf"
+   },
+   "mergedAt": "2026-09-27T01:03:58Z",
+   "number": 32,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/32",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-2-verifier-attestation",
+   "headRefOid": "31fe6e1fcf126b3c19f6c08685927a4560bb9059",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "f14709aaae205bb967c79548add72c78b63221b8"
+   },
+   "mergedAt": "2026-09-27T01:10:51Z",
+   "number": 33,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/33",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "patch/p2-mediums",
+   "headRefOid": "0a169d3d6215f6882235f34f648aac588e732fb0",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "1905b5b7c22847a9c32bcc6b05fad3a818872466"
+   },
+   "mergedAt": "2026-09-27T03:52:28Z",
+   "number": 34,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/34",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/plan-factory-v3-2-p4",
+   "headRefOid": "03e07e414c01cec83157077f4f62f84b77a2664a",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "19e622874c48a6a30698fa34cf821e533e484973"
+   },
+   "mergedAt": "2026-09-27T13:17:09Z",
+   "number": 35,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/35",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-4-security-floor",
+   "headRefOid": "6c5e49fe7148190f529f04654c9d2bde29ac995c",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "f0031129cab02873d2a0f860d14e23e2f44a957d"
+   },
+   "mergedAt": "2026-09-27T14:30:36Z",
+   "number": 36,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/36",
+   "body": ""
+  },
+  {
+   "author": {
+    "is_bot": true,
+    "login": "app/dependabot"
+   },
+   "baseRefName": "main",
+   "headRefName": "dependabot/github_actions/actions/checkout-7.0.1",
+   "headRefOid": "53229f4278fe10620e0bae5988d5fb3bc7371fc6",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 37,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/37",
+   "body": ""
+  },
+  {
+   "author": {
+    "is_bot": true,
+    "login": "app/dependabot"
+   },
+   "baseRefName": "main",
+   "headRefName": "dependabot/github_actions/actions/cache-6.1.0",
+   "headRefOid": "bc70a83e3903dbbf6a3a5288cc8bdbdb363e2950",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 38,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/38",
+   "body": ""
+  },
+  {
+   "author": {
+    "is_bot": true,
+    "login": "app/dependabot"
+   },
+   "baseRefName": "main",
+   "headRefName": "dependabot/github_actions/actions/setup-python-7.0.0",
+   "headRefOid": "b8ef6eee870e2cdf5ac9bdb06680608264fd749d",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 39,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/39",
+   "body": ""
+  },
+  {
+   "author": {
+    "is_bot": true,
+    "login": "app/dependabot"
+   },
+   "baseRefName": "main",
+   "headRefName": "dependabot/pip/scripts/ruff-0.16.8",
+   "headRefOid": "5b9a83d6ac1bd98aed2afbf894a4697e80a3d00a",
+   "isDraft": false,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 40,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/40",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "phase/plan-factory-v3-2-p3",
+   "headRefOid": "3ac5cd7e18a9d79045834a8d3f074576720ad712",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "e88e8361ef913ca7ac7475e506610003be7574bb"
+   },
+   "mergedAt": "2026-09-28T12:09:52Z",
+   "number": 41,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/41",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "impl/plan-3-mechanized-gates",
+   "headRefOid": "2f2cc8a45d31f9403b78f118b55b195baab98620",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "1ee84c87669b3439c9bc28ca9335b59f9847d6a4"
+   },
+   "mergedAt": "2026-09-28T12:10:21Z",
+   "number": 42,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/42",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "patch/action-bumps",
+   "headRefOid": "82d642e18ed44b24bd5a8e62d32efbc1be860230",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "4f1923f48f0d4b7eb85604271947e420b8481a29"
+   },
+   "mergedAt": "2026-09-28T12:32:30Z",
+   "number": 43,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/43",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "patch/p3-mediums",
+   "headRefOid": "1c795208e8612ba7b7798ab759ec3431a1d1d03a",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "de5e859a9fd6e228c5772851ed8e52f745c4c84e"
+   },
+   "mergedAt": "2026-09-28T13:03:03Z",
+   "number": 44,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/44",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "diag/first-run-floor",
+   "headRefOid": "03c9650712b45df946054e95ed42c8628e6ebfed",
+   "isDraft": true,
+   "mergeCommit": null,
+   "mergedAt": null,
+   "number": 45,
+   "reviewDecision": "",
+   "state": "CLOSED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/45",
+   "body": ""
+  },
+  {
+   "author": {
+    "id": "U_kgDOEABMUg",
+    "is_bot": false,
+    "login": "kpingali123",
+    "name": ""
+   },
+   "baseRefName": "main",
+   "headRefName": "patch/first-run-argmax",
+   "headRefOid": "d8aac5f06bb2e8006008a49963be00ed61f471fc",
+   "isDraft": false,
+   "mergeCommit": {
+    "oid": "b3db4791bcaccde025e0ff7cf675e18b5b3af66b"
+   },
+   "mergedAt": "2026-09-28T13:25:59Z",
+   "number": 46,
+   "reviewDecision": "",
+   "state": "MERGED",
+   "url": "https://github.com/Apps-Consultants/factory/pull/46",
+   "body": ""
+  }
+ ]
+}

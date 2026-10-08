@@ -1,0 +1,18 @@
+{
+  "about": "Pre: spec_has_tagged_reqs implies has_spec; otherwise a ValueError.",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "spec_has_tagged_reqs": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

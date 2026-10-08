@@ -1,0 +1,25 @@
+{
+  "about": "Patch tier: patch/<slug> implements as PatchTier, in the build lane.",
+  "branch": {
+    "kind": "Patch",
+    "slug": "typo-fix"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "PatchTier"
+      }
+    },
+    "open_lanes": []
+  }
+}

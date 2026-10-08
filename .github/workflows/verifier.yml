@@ -1,0 +1,202 @@
+name: Verifier
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+concurrency:
+  # Keyed on the PR, not the head branch: two PRs sharing a head (a stacked PR
+  # being retargeted) must not cancel each other's runs.
+  group: verifier-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  progress-check:
+    name: Check PROGRESS.md not in PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Fail if PROGRESS.md is in the diff
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          # The full ref, never the short origin/$BASE_REF: fetch-depth: 0 brings tags, and a tag named origin/<base>
+          # outranks the remote-tracking ref in a short-name lookup.
+          if git diff --name-only "refs/remotes/origin/$BASE_REF...HEAD" | grep -q '^PROGRESS\.md$'; then
+            echo "::error::PROGRESS.md must be removed before merging. Run: git rm PROGRESS.md && git commit -m 'remove session handoff'"
+            exit 1
+          fi
+
+  # The verifier review itself runs LOCALLY on a developer's Claude Code
+  # subscription via scripts/run-verifier.sh (claude -p), not in CI — the
+  # team has no API-key billing. This job runs the shared classifier
+  # (attestation.py check, the base branch's own copy) against the base
+  # branch's current tip to attest that an accepted verifier comment (or
+  # maintainer waiver) exists for this head SHA.
+  verifier:
+    name: verifier
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # attestation.py check's --commits/--files/--contents flags are test-only
+      # inputs (synthetic diff data); this workflow must never pass them, so
+      # the Dependabot exemption always reads the PR's real commits and diff.
+      - name: Check the attestation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REF: ${{ github.base_ref }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          git fetch --quiet origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          # The base by its full ref, never the short origin/$BASE_REF: the
+          # checkout (fetch-depth: 0) brings tags, and a tag literally named
+          # origin/<base> outranks the remote-tracking ref in a short-name
+          # lookup, so whoever pushed one would choose the classifier below.
+          BASE="refs/remotes/origin/$BASE_REF"
+          # Run the BASE's classifier, never the PR's own copy: materialise it
+          # from $BASE (cwd stays at the checkout so its git
+          # commands still see the repository). Residual: under pull_request
+          # this workflow file itself still comes from the PR, so a bypass
+          # needs an edit to verifier.yml, which code mode flags as gate code.
+          LIB="$RUNNER_TEMP/specflow-base/scripts/lib/specflow"
+          mkdir -p "$LIB"
+          # Fail closed: only the module's ABSENCE at the base (git cat-file -e)
+          # takes the bootstrap fallback; a base that has it but cannot be read
+          # fails the job.
+          git rev-parse --verify --quiet "$BASE^{commit}" > /dev/null \
+            || { echo "::error::cannot resolve $BASE"; exit 1; }
+          if git cat-file -e "$BASE:scripts/lib/specflow/attestation.py" 2>/dev/null; then
+            git show "$BASE:scripts/lib/specflow/attestation.py" > "$LIB/attestation.py" \
+              || { echo "::error::$BASE has attestation.py but git show failed; not falling back"; exit 1; }
+            git show "$BASE:scripts/lib/specflow/config.py" > "$LIB/config.py" \
+              || { echo "::error::git show $BASE:scripts/lib/specflow/config.py failed"; exit 1; }
+            if git cat-file -e "$BASE:scripts/lib/specflow/__init__.py" 2>/dev/null; then
+              git show "$BASE:scripts/lib/specflow/__init__.py" > "$LIB/__init__.py" \
+                || { echo "::error::git show $BASE:scripts/lib/specflow/__init__.py failed"; exit 1; }
+            else
+              : > "$LIB/__init__.py"
+            fi
+            ATTESTATION="$LIB/attestation.py"
+            BOOTSTRAP=0
+          else
+            echo "bootstrap: $BASE predates the attestation module, so this PR head's own classifier is running and is not a control (the PR can rewrite it); for an honest PR a maintainer waiver is the route to green."
+            ATTESTATION="scripts/lib/specflow/attestation.py"
+            BOOTSTRAP=1
+          fi
+          # SEC-020: on a stacked PR the classifier above is the stacked base's own, unreviewed, and so is the hint it
+          # prints on failure; on the bootstrap path it is the PR head's own. Its output is captured, labelled as that
+          # branch's text unless it is main's reviewed classifier, every carriage return turned into a space (the
+          # runner also ends a line at a bare \r), indented, and printed between ::stop-commands::<random token> and
+          # ::<token>::, so a workflow command (::error::, ::set-output) in the text it prints is never processed; the
+          # bootstrap command is printed by this step, a literal (main's reviewed script, or on the bootstrap path the
+          # --bootstrap route), never taken from the classifier. This covers the text the classifier prints, not its
+          # code: it runs in this job and can still reach the log by other routes.
+          ATT_OUT="$RUNNER_TEMP/attestation.out"
+          RC=0
+          python3 "$ATTESTATION" check --repo "$REPO" --pr "$PR" --head "$HEAD_SHA" --base-ref "$BASE" --base-name "$BASE_REF" --pr-author "$PR_AUTHOR" > "$ATT_OUT" 2>&1 || RC=$?
+          if [ "$BASE_REF" = main ] && [ "$BOOTSTRAP" = 0 ]; then
+            cat "$ATT_OUT"
+          else
+            if [ "$BOOTSTRAP" = 1 ]; then
+              echo "The lines below were printed by this PR head's own classifier (bootstrap, unreviewed); treat any command they name as untrusted."
+            else
+              echo "The lines below were printed by the stacked base's own classifier ($BASE_REF, unreviewed); treat any command they name as untrusted."
+            fi
+            STOP=$(python3 -c 'import secrets; print(secrets.token_hex(16))')
+            echo "::stop-commands::$STOP"
+            tr '\r' ' ' < "$ATT_OUT" | sed 's/^/| /'
+            echo "::$STOP::"
+          fi
+          if [ "$RC" -ne 0 ] && [ "$BOOTSTRAP" = 1 ]; then
+            echo "To attest, this base predates the attestation module: from a checkout of the PR head, in a terminal outside any Claude Code session, run: bash scripts/run-verifier.sh $PR --bootstrap — then a maintainer posts a waiver naming that comment (CI never accepts a bootstrap marker)"
+          elif [ "$RC" -ne 0 ]; then
+            echo "To attest, from a terminal outside any Claude Code session, run: git show refs/remotes/origin/main:scripts/run-verifier.sh | bash -s -- $PR"
+          fi
+          exit "$RC"
+
+  verify-dafny:
+    name: Dafny formal verification
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'has-verification') ||
+      startsWith(github.head_ref, 'phase/validate') ||
+      startsWith(github.head_ref, 'impl/') ||
+      startsWith(github.head_ref, 'phase/plan-') ||
+      startsWith(github.head_ref, 'design/') ||
+      startsWith(github.head_ref, 'build/') ||
+      startsWith(github.head_ref, 'ship/') ||
+      startsWith(github.head_ref, 'phase/security') ||
+      startsWith(github.head_ref, 'phase/release')
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install Dafny (release zip bundles the Z3 solver)
+        run: |
+          curl -sSL -o "$RUNNER_TEMP/dafny.zip" \
+            https://github.com/dafny-lang/dafny/releases/download/v4.11.0/dafny-4.11.0-x64-ubuntu-22.04.zip
+          echo "a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179  $RUNNER_TEMP/dafny.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/dafny.zip" -d "$RUNNER_TEMP/dafny-dist"
+          echo "$RUNNER_TEMP/dafny-dist/dafny" >> "$GITHUB_PATH"
+      - name: Verify all .dfy files (recursive)
+        run: |
+          # Proofs live in verification/<subdir>/ — discovery must be recursive,
+          # matching scripts/run-quality-gates.sh.
+          if find verification -type f -name '*.dfy' | grep -q .; then
+            find verification -type f -name '*.dfy' -exec dafny verify {} +
+          else
+            echo "No .dfy files to verify — skipping"
+          fi
+
+  contract-alignment:
+    name: Contract-proof alignment check
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'has-verification') ||
+      startsWith(github.head_ref, 'phase/validate') ||
+      startsWith(github.head_ref, 'impl/') ||
+      startsWith(github.head_ref, 'phase/plan-') ||
+      startsWith(github.head_ref, 'design/') ||
+      startsWith(github.head_ref, 'build/') ||
+      startsWith(github.head_ref, 'ship/') ||
+      startsWith(github.head_ref, 'phase/security') ||
+      startsWith(github.head_ref, 'phase/release')
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check Proves/Extracted-from header alignment
+        run: |
+          ERRORS=0
+          while IFS= read -r dfy; do
+            proves=$(head -5 "$dfy" | grep -oE 'Proves:.*' || true)
+            if [ -z "$proves" ]; then
+              echo "::warning file=$dfy::Missing Proves: REQ-NNN header"
+            fi
+          done < <(find verification -type f -name '*.dfy')
+          while IFS= read -r contract; do
+            case "$(basename "$contract")" in
+              __init__.py|README.md) continue ;;
+            esac
+            extracted=$(head -3 "$contract" | grep -oE 'Extracted from: [^ ]+' | sed 's/Extracted from: //' || true)
+            if [ -n "$extracted" ] && [ ! -f "$extracted" ]; then
+              echo "::error file=$contract::References $extracted which does not exist"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find src/contracts -type f \( -name '*.py' -o -name '*.ts' \) 2>/dev/null)
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::$ERRORS contract-proof alignment errors found"
+            exit 1
+          fi
+          echo "Contract-proof alignment check passed"

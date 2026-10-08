@@ -1,0 +1,26 @@
+{
+  "about": "Pre: unbuilt sorted ascending by (slug, n); an unsorted list is a ValueError.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "unbuilt": [
+      [
+        "b",
+        1
+      ],
+      [
+        "a",
+        2
+      ]
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "error": "ValueError"
+  }
+}

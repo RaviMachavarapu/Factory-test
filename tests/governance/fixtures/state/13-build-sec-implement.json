@@ -1,0 +1,26 @@
+{
+  "about": "The back-edge, lanes: build/sec-<id> implements the security fix.",
+  "branch": {
+    "kind": "BuildSec",
+    "id": "SEC-004"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "SecFix",
+        "id": "SEC-004"
+      }
+    },
+    "open_lanes": []
+  }
+}

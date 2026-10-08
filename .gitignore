@@ -1,0 +1,45 @@
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets
+.env
+.env.local
+.env.*
+!.env.example
+secrets/
+
+# Generated dashboard (regenerated on demand)
+docs/dashboard/
+
+*.bak
+*.tmp
+# Lockfiles are committed (art-repository-singleton): package-lock.json,
+# Cargo.lock, pubspec.lock, uv.lock all ship in stack overlays and instances.
+
+# Dafny build artifacts
+verification/*-cs/
+verification/*-java/
+verification/*-js/
+verification/*-go/
+verification/*-py/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Security floor summary (regenerated on every gates run, REQ-330)
+.specflow/floor-summary.json

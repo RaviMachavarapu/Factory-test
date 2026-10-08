@@ -1,0 +1,32 @@
+{
+  "about": "The factory's own history: patch/first-run-argmax with merged PR #46 derives merged, back to main.",
+  "branch": {
+    "kind": "Patch",
+    "slug": "first-run-argmax"
+  },
+  "branch_name": "patch/first-run-argmax",
+  "branch_pr": {
+    "number": 46,
+    "open": false,
+    "merged": true,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "approve",
+    "mine": true
+  },
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_source_diff": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "merged",
+    "step": {
+      "kind": "CheckoutMain"
+    },
+    "open_lanes": []
+  }
+}

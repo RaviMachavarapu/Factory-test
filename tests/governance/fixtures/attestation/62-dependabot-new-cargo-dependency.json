@@ -1,0 +1,49 @@
+{
+  "rule": "Cargo.toml bumps serde and adds a crate the base does not list: NOT exempt (content:<path>:new-dependency)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "src-tauri/Cargo.toml"
+    ],
+    "contents": {
+      "src-tauri/Cargo.toml": {
+        "base": "[dependencies]\nserde = \"1.0.0\"\n",
+        "head": "[dependencies]\nserde = \"1.0.1\"\nevil-crate = \"0.1.0\"\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

@@ -1,0 +1,35 @@
+# SpecFlow stack pack metadata for `flutter` (REQ-303).
+stack: flutter
+guided_choice: 3
+guided_label: a multi-platform app
+guided_rationale: Flutter keeps one Dart codebase that can later target iOS, Android, Windows and Linux; v3.2 builds, tests and ships the macOS app only.
+guided_consequence: You get the macOS build of an app that can later be extended to phones and other desktops.
+testing: flutter test (test/), dart analyze --fatal-infos, governance tests (tests/governance/)
+ci_runs_on: macos-15
+python_version: "3.12"
+source_roots: [lib]
+test_globs: [test/**/*_test.dart]
+test_first_rules: ["lib/** -> test/**/*_test.dart"]
+coverage_exclude: [lib/main.dart]
+lockfile: pubspec.lock
+lockfiles: [pubspec.lock]
+floor_tools: [osv-scanner]
+flutter_version: 3.47.6
+flutter_revision: 5fc346839b5d0eef006ed8404392afb4dfae428d
+macos_min: "12.0"
+macos_archs: arm64
+macos_host: "27.0 (Xcode 27, CocoaPods installed, Flutter darwin engine artifacts cached)"
+prereqs: [xcode, cocoapods, flutter, flutter_macos]
+check_xcode: xcodebuild -version
+install_macos_xcode: install Xcode from the App Store (open 'macappstore://apps.apple.com/app/id497799835'), then: xcode-select --install; sudo xcode-select -s /Applications/Xcode.app/Contents/Developer && sudo xcodebuild -runFirstLaunch
+install_linux_xcode: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_cocoapods: pod --version
+install_macos_cocoapods: brew install cocoapods
+install_linux_cocoapods: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_flutter: flutter --version --machine | grep -q '"frameworkRevision": "5fc346839b5d0eef006ed8404392afb4dfae428d"'
+install_macos_flutter: git clone --depth 1 --branch 3.47.6 https://github.com/flutter/flutter.git "$HOME/development/flutter" && test "$(git -C "$HOME/development/flutter" rev-parse HEAD)" = 5fc346839b5d0eef006ed8404392afb4dfae428d && echo 'export PATH="$HOME/development/flutter/bin:$PATH"' >> ~/.zprofile
+install_linux_flutter: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+check_flutter_macos: test -d "$(flutter --version --machine | python3 -c 'import json,sys; print(json.load(sys.stdin)["flutterRoot"])')/bin/cache/artifacts/engine/darwin-x64"
+install_macos_flutter_macos: flutter precache --macos
+install_linux_flutter_macos: not supported: v3.2 builds app stacks on macOS only — use a Mac, or the macos-15 CI workflow
+verifier_deny: [./**/*.p12, ./**/*.p8, ./**/*.jks, ./**/*.keystore, ./**/key.properties]

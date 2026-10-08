@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # A pull_request run is keyed on the PR number, never the head branch (verifier.yml's group is keyed on the PR
+  # number too): two PRs sharing a head, or a stacked PR being retargeted, never cancel each other, and a push and a
+  # PR-body edit seconds apart cancel the older run of the same PR. Any other event (a push to main) gets a group of
+  # its own run id: GitHub keeps one running and one pending run per group and cancels a pending run when a newer
+  # one queues, whatever cancel-in-progress says, so a group shared by main's pushes would drop a commit's run.
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || format('ci-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  gates:
+    name: gates
+    runs-on: ubuntu-latest # specflow:runs-on
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Stack toolchain (installed by init from the pack)
+        if: hashFiles('.github/actions/toolchain/action.yml') != ''
+        uses: ./.github/actions/toolchain
+
+      - name: Cache the floor tool assets
+        if: hashFiles('.github/actions/toolchain/action.yml') == ''
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/specflow-tools
+          key: ${{ runner.os }}-specflow-tools-${{ hashFiles('scripts/pinned-tools.yml') }}
+
+      - name: Floor tools (gitleaks, osv-scanner)
+        if: hashFiles('.github/actions/toolchain/action.yml') == ''
+        run: |
+          bash scripts/install-pinned-tool.sh gitleaks osv-scanner --dest "$HOME/.local/specflow-bin"
+          echo "$HOME/.local/specflow-bin" >> "$GITHUB_PATH"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12" # specflow:python-version
+
+      - name: Install Python dependencies
+        run: pip install --require-hashes -r scripts/requirements.txt
+
+      - name: Install Dafny (release zip bundles the Z3 solver)
+        if: runner.os == 'Linux'
+        run: |
+          curl -sSL -o "$RUNNER_TEMP/dafny.zip" \
+            https://github.com/dafny-lang/dafny/releases/download/v4.11.0/dafny-4.11.0-x64-ubuntu-22.04.zip
+          echo "a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179  $RUNNER_TEMP/dafny.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/dafny.zip" -d "$RUNNER_TEMP/dafny-dist"
+          echo "$RUNNER_TEMP/dafny-dist/dafny" >> "$GITHUB_PATH"
+
+      - name: Test-first per commit (REQ-321)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+          bash scripts/check-test-first.sh --base "$BASE_SHA" --head "$HEAD_SHA" --pr-body-file "$RUNNER_TEMP/pr-body.md"
+
+      - name: Test-first per commit (REQ-321, push)
+        if: github.event_name != 'pull_request'
+        run: bash scripts/check-test-first.sh
+
+      # SPECFLOW_BASE_REF is the full refs/remotes/origin/<base>, never the short origin/<base>: fetch-depth: 0 brings tags,
+      # and a tag literally named origin/<base> outranks the remote-tracking ref in a short-name lookup, so whoever pushed
+      # one would choose every base-ref read the gates make (Build 2 fix wave 2, REQ-384).
+      - name: Run quality gates
+        env:
+          SPECFLOW_BASE_REF: ${{ github.event_name == 'pull_request' && format('refs/remotes/origin/{0}', github.base_ref) || '' }}
+          SPECFLOW_HEAD_BRANCH: ${{ github.head_ref }}
+          SPECFLOW_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bash scripts/run-quality-gates.sh
+
+  # >>> specflow:template-only — init-project.sh deletes from here to the end marker
+  first-run:
+    name: "First run (python, ${{ matrix.profile }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [guided, engineer]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Cache the floor tool assets
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/specflow-tools
+          key: ${{ runner.os }}-specflow-tools-${{ hashFiles('scripts/pinned-tools.yml') }}
+
+      - name: Floor tools (gitleaks, osv-scanner)
+        run: |
+          bash scripts/install-pinned-tool.sh gitleaks osv-scanner --dest "$HOME/.local/specflow-bin"
+          echo "$HOME/.local/specflow-bin" >> "$GITHUB_PATH"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12" # specflow:python-version
+
+      - name: Install Python dependencies
+        run: pip install --require-hashes -r scripts/requirements.txt
+
+      - name: Install the python instance lockfile (pip-audit, bandit)
+        run: pip install --require-hashes -r stacks/python/skeleton/requirements.txt
+
+      - name: Install Dafny (release zip bundles the Z3 solver)
+        run: |
+          curl -sSL -o "$RUNNER_TEMP/dafny.zip" \
+            https://github.com/dafny-lang/dafny/releases/download/v4.11.0/dafny-4.11.0-x64-ubuntu-22.04.zip
+          echo "a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179  $RUNNER_TEMP/dafny.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/dafny.zip" -d "$RUNNER_TEMP/dafny-dist"
+          echo "$RUNNER_TEMP/dafny-dist/dafny" >> "$GITHUB_PATH"
+
+      - name: First run
+        env:
+          SPECFLOW_FIRST_RUN: "1"
+          FIRST_RUN_CASES: ${{ matrix.profile }}
+        run: bash tests/governance/test_first_run.sh
+
+  app-profiles:
+    name: "App-stack profiles (tauri, flutter)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Profile diff (toolchain-free)
+        env:
+          SPECFLOW_FIRST_RUN: "1"
+          FIRST_RUN_CASES: profiles
+        run: bash tests/governance/test_first_run.sh
+  # <<< specflow:template-only

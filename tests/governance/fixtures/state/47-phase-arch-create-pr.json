@@ -1,0 +1,23 @@
+{
+  "about": "State table: complete architecture derives open-pr, CreatePr.",
+  "branch": {
+    "kind": "PhaseArch",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "arch_complete": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "arch",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

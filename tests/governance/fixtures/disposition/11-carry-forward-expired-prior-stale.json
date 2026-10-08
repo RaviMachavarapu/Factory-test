@@ -1,0 +1,45 @@
+{
+  "about": "A lapsed prior medium, current entry kept at the same stale (past) expiry: rule 4 (and rule 5).",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "cvss_vector": "@medium"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-09-01",
+      "rationale": "not refreshed",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "status": "accepted",
+      "expiry": "2026-08-01",
+      "version": "1.0.0"
+    }
+  ],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": false,
+    "violations": [
+      [
+        "SEC-001",
+        "carry_forward"
+      ],
+      [
+        "SEC-001",
+        "expiry_window"
+      ]
+    ]
+  }
+}

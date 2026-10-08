@@ -1,0 +1,22 @@
+{
+  "about": "State table, regulated phase/arch-<slug>: incomplete architecture derives architecture.",
+  "branch": {
+    "kind": "PhaseArch",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "arch",
+    "phase": "architecture",
+    "step": {
+      "kind": "RunArchitecture"
+    },
+    "open_lanes": []
+  }
+}

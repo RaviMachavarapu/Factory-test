@@ -1,0 +1,12 @@
+{
+  "about": "A negative medium_cap: precondition violation.",
+  "review": [],
+  "disposition": [],
+  "prior": [],
+  "medium_cap": -1,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "error": "ValueError"
+  }
+}

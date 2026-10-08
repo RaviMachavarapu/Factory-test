@@ -1,0 +1,26 @@
+{
+  "about": "State table: tagged REQs with architecture complete derives plan.",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true,
+    "has_spec": true,
+    "spec_has_tagged_reqs": true,
+    "arch_complete": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "plan",
+    "step": {
+      "kind": "RunPlan"
+    },
+    "open_lanes": []
+  }
+}

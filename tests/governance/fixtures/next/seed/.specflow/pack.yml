@@ -1,0 +1,6 @@
+stack: python
+source_roots: [src]
+test_globs: [tests/**/test_*.py]
+test_first_rules: ["src/** -> tests/**/test_*.py"]
+non_source: []
+coverage_exclude: []

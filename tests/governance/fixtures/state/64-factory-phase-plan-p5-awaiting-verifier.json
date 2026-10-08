@@ -1,0 +1,45 @@
+{
+  "about": "The factory's own history: phase/plan-factory-v3-2-p5 parses as PhasePlan and, with its open PR without a marker, is awaiting-verifier (Review Focus 1).",
+  "branch": {
+    "kind": "PhasePlan",
+    "slug": "factory-v3-2-p5"
+  },
+  "branch_name": "phase/plan-factory-v3-2-p5",
+  "branch_pr": {
+    "number": 47,
+    "open": true,
+    "merged": false,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "none",
+    "mine": true
+  },
+  "open_lane_prs": [
+    {
+      "number": 47,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true,
+    "has_plan": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "plan",
+    "phase": "awaiting-verifier",
+    "step": {
+      "kind": "RunVerifier",
+      "pr": 47
+    },
+    "open_lanes": [
+      47
+    ]
+  }
+}

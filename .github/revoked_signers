@@ -1,0 +1,3 @@
+# SpecFlow revoked release signers (REQ-383; P6 R3). One public key per line: <key type> <base64 public key>, the first
+# two fields of a .pub file. A tag signed by a key listed here is refused (revoked); the file is read at the tag and, at
+# tag time, on main's tip too (a union), so a revocation merged after the tag's commit still refuses it.

@@ -1,0 +1,705 @@
+# REQ-350, REQ-383, REQ-384 (P6 R15, R27, R28, R30, R31, R34, R35): the release at the tag. A push of a vX.Y.Z tag (or a
+# dispatch on one) is verified, rebuilt from a fresh checkout of the tagged commit, compared with the rows the ship PR's
+# notes transcribed, and published as a draft GitHub Release that becomes visible only once every asset is on it.
+#
+#   verify        the tag name, the tag object, the tag's commit the newest first-parent commit of main that added the
+#                 version's notes (its ship PR's merge), the signing anchor, every first-parent commit since the newest
+#                 earlier published Release (the CI check's own classifier), the stack and the signing policy at the tag,
+#                 and gates section 7 replayed at the tag (its signature against the anchor included) — never a build,
+#                 never a toolchain, never the other gate sections (R30)
+#   build-source  the reproducible subset from verify's commit, compared with the tagged notes
+#   image prune   the python stack's jobs, thin shells over ./.github/actions/release (a stack action Build 4 adds);
+#                 every stack job first checks that the action is installed and fails with its own message when not
+#   bundle signing-probe sign verify-signed
+#                 the tauri and flutter jobs, the same shape (Build 5's action); the Apple secrets live in the release
+#                 environment and are read by signing-probe and sign only
+#   publish       the manifest, the body, a draft Release, every asset, then the publication
+#
+# The stack every stack job selects on is verify's output, read by packinfo.py from the pack at the tag (an instance's
+# .specflow.yml names it; the template source's own pack says template); the jobs never read a .stack file themselves.
+#
+# REQ-334: read-only at the top; only publish (contents) and image and prune (packages) elevate; every action is pinned
+# to a commit SHA; every checkout drops its credentials; no job restores a cache; every value reaches a run: block
+# through env: (a tag name is attacker-chosen text, validated before any use); no secret is read outside the two signing
+# jobs; every job is bounded. A real run happens at a tag push only: its text is pinned by tests/governance, and every
+# script it calls is run there against stubs.
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    outputs:
+      release: ${{ steps.tag.outputs.release }}
+      version: ${{ steps.tag.outputs.version }}
+      stack: ${{ steps.resolve.outputs.stack }}
+      commit: ${{ steps.main.outputs.commit }}
+      tag_object: ${{ steps.main.outputs.tag_object }}
+      prev: ${{ steps.resolve.outputs.prev }}
+      signing: ${{ steps.resolve.outputs.signing }}
+      anchor: ${{ steps.anchor.outputs.anchor }}
+      tag_kind: ${{ steps.tagsig.outputs.tag_kind }}
+    steps:
+      # The name reaches shell through env only. A ref that is not a tag (a dispatch on a branch) or a tag that is not
+      # vX.Y.Z ends the run with a notice and publishes nothing; the value itself is never printed or used.
+      - name: Validate the tag name
+        id: tag
+        env:
+          TAG: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+          if [ "$REF_TYPE" != tag ]; then
+            echo "::notice::release.yml ran on a ref that is not a tag; nothing is released"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::notice::the tag is not named vX.Y.Z; nothing is released"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "release=true"
+            echo "version=${TAG#v}"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.tag.outputs.release == 'true'
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The checkout leaves the tag as a lightweight ref (measured); the tag object is fetched again and must be one.
+      # The token, when there is one, is given to this step's git processes through the environment only: nothing is
+      # written to .git/config, where a later step could read it. main is fetched by its full ref, never the short name
+      # (a tag literally named origin/main outranks a short-name lookup), and so are the PR heads.
+      - name: Re-fetch the tag object
+        if: steps.tag.outputs.release == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -n "${GH_TOKEN:-}" ]; then
+            export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.https://github.com/.extraheader
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
+            export GIT_CONFIG_VALUE_0
+          fi
+          git fetch --force --no-tags origin "+refs/tags/$TAG:refs/tags/$TAG"
+          test "$(git cat-file -t "refs/tags/$TAG")" = tag
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main' '+refs/pull/*/head:refs/remotes/origin/pr/*'
+
+      # A first-parent commit of main, not merely an ancestor: under merge commits a merged PR's intermediate commits are
+      # ancestors of main, never reviewed as a head, and carry a tree and a workflow of their own (the anchor's rule, R3).
+      # And the newest first-parent commit of main that added docs/releases/<v>-notes.md (release-tag.sh's rule): the ship
+      # PR's merge, never a later push whose committer date bounds the replay's run date (Build 3 final review, finding 20).
+      - name: The tag is on main
+        id: main
+        if: steps.tag.outputs.release == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          commit="$(git rev-parse "refs/tags/$TAG^{commit}")"
+          firstparents="$(git rev-list --first-parent refs/remotes/origin/main)"
+          if ! grep -qx "$commit" <<<"$firstparents"; then
+            echo "::error::the tagged commit $commit is not a first-parent commit of main: a release tag sits on a reviewed merge"
+            exit 1
+          fi
+          notes="docs/releases/${TAG#v}-notes.md"
+          ship="$(git log --max-count=1 --first-parent --diff-merges=first-parent --diff-filter=A --no-patch --format=%H refs/remotes/origin/main -- "$notes")"
+          if [ "$commit" != "$ship" ]; then
+            echo "::error::the tagged commit $commit is not the newest first-parent commit of main that added $notes (${ship:-none}): a release tag sits on its ship PR's merge"
+            exit 1
+          fi
+          {
+            echo "commit=$commit"
+            echo "tag_object=$(git rev-parse "refs/tags/$TAG")"
+          } >> "$GITHUB_OUTPUT"
+
+      # No anchor (exit 3) is not a refusal here: the tag's own verdict is verify-release.sh --at-tag's, which refuses an
+      # SSH signature with no anchor key and accepts an unsigned tag only with the recorded fallback. A refusal
+      # (anchor-off-main, anchor-unverified) is a finding, never an absence.
+      - name: Find the signing anchor
+        id: anchor
+        if: steps.tag.outputs.release == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          rc=0
+          out="$(python3 -I scripts/lib/specflow/signers.py --root . --base-ref refs/remotes/origin/main anchor --tag "$TAG" 2>&1)" || rc=$?
+          case "$rc" in
+            0)
+              ref="$(printf '%s\n' "$out" | sed -n 's/^anchor: \([^ ]*\) .*$/\1/p' | head -n 1)"
+              if [ -z "$ref" ]; then
+                echo "::error::signers.py anchor exited 0 without an anchor line"
+                exit 1
+              fi
+              echo "anchor=$ref" >> "$GITHUB_OUTPUT"
+              ;;
+            3)
+              echo "anchor=-" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              printf '%s\n' "$out" >&2
+              echo "::error::the signing anchor is refused (signers.py exit $rc)"
+              exit 1
+              ;;
+          esac
+
+      # The previous release must be a tag that verifies as released: a missing tag, or a signature this runner cannot
+      # check, is a refusal at the tag (the PR-time check only warns).
+      - name: Resolve the stack and the previous release
+        id: resolve
+        if: steps.tag.outputs.release == 'true'
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          set -euo pipefail
+          stack="$(python3 -I scripts/lib/specflow/packinfo.py --root . stack)"
+          if ! [[ "$stack" =~ ^[a-z][a-z0-9-]*$ ]]; then
+            echo "::error::the governing pack names no usable release stack"
+            exit 1
+          fi
+          signing="$(python3 -I scripts/lib/specflow/config.py --root . get signing --default none)"
+          case "$signing" in
+            none|apple) ;;
+            *)
+              echo "::error::.specflow.yml at the tag names no usable signing policy (none or apple)"
+              exit 1
+              ;;
+          esac
+          # The same check release-tag.sh runs before it signs (signers.py previous, one function): a previous release
+          # whose notes are on main but whose tag is missing, or whose tag is lightweight, gpg-unverifiable, no-anchor
+          # or refused, ends the run here.
+          prc=0
+          pout="$(python3 -I scripts/lib/specflow/signers.py --root . --base-ref refs/remotes/origin/main previous --version "$VERSION" 2>&1)" || prc=$?
+          printf '%s\n' "$pout"
+          if [ "$prc" != 0 ]; then
+            echo "::error::the previous release is not verifiably released at the tag (signers.py previous exit $prc): tag it, or re-create its tag, before this release ships"
+            exit 1
+          fi
+          prev="$(printf '%s\n' "$pout" | sed -n 's/^previous: \(v[0-9][0-9.]*\) .*$/\1/p' | head -n 1)"
+          {
+            echo "stack=$stack"
+            echo "prev=$prev"
+            echo "signing=$signing"
+          } >> "$GITHUB_OUTPUT"
+
+      # Every first-parent commit of main since the newest earlier release whose GitHub Release is published (a tag whose
+      # own run refused excuses nothing), through the CI check's own classifier (R11, R28): release-check finds the start
+      # itself, so no --since is passed.
+      - name: Re-check the merged PRs since the previous release
+        if: steps.tag.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          VERSION: ${{ steps.tag.outputs.version }}
+          COMMIT: ${{ steps.main.outputs.commit }}
+        run: |
+          set -euo pipefail
+          python3 -I scripts/lib/specflow/attestation.py release-check --repo "$REPO" --version "$VERSION" \
+            --tag-commit "$COMMIT" --base-ref refs/remotes/origin/main
+
+      # The documents, the app-stack rules, the disposition gate, the previous tag, the claims, and the tag's own
+      # signature against the anchor: replayed at the tag. Never a build, never the gates (no toolchain here).
+      - name: Replay the release checks at the tag
+        if: steps.tag.outputs.release == 'true'
+        env:
+          SPECFLOW_BASE_REF: refs/remotes/origin/main
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: bash scripts/verify-release.sh --version "$VERSION" --at-tag
+
+      # The tag's own verdict, for the Release body (wave 1 round 2): the body gives the verify-tag command only for an
+      # ssh-good tag, never because an anchor exists (a TOFU anchor exists once allowed_signers lists a key, and an
+      # annotated, unsigned tag with its fallback recorded passes the replay above). At tag time, as the replay reads it
+      # (no --released: the base's revocations count). ssh-good must name the anchor step's anchor; unsigned (exit 3) is
+      # the annotated-tag text, with or without an anchor; any other verdict fails here (the replay refused it already).
+      - name: Read the tag's own signature
+        id: tagsig
+        if: steps.tag.outputs.release == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+          ANCHOR: ${{ steps.anchor.outputs.anchor }}
+        run: |
+          set -euo pipefail
+          rc=0
+          out="$(python3 -I scripts/lib/specflow/signers.py --root . --base-ref refs/remotes/origin/main verify --tag "$TAG" 2>&1)" || rc=$?
+          kind="$(printf '%s\n' "$out" | sed -n 's/^kind: \([a-z-]*\) .*$/\1/p' | head -n 1)"
+          vanchor="$(printf '%s\n' "$out" | sed -n 's/^kind: .* anchor: \([^ ]*\)$/\1/p' | head -n 1)"
+          case "$rc:$kind" in
+            0:ssh-good)
+              if [ "$vanchor" != "$ANCHOR" ]; then
+                echo "::error::the tag verifies ssh-good against ${vanchor:-no anchor}, not the anchor step's $ANCHOR"
+                exit 1
+              fi
+              ;;
+            3:unsigned) ;;
+            *)
+              printf '%s\n' "$out" >&2
+              echo "::error::the tag's own verdict is neither ssh-good nor unsigned (signers.py verify exit $rc): nothing is published"
+              exit 1
+              ;;
+          esac
+          echo "tag_kind=$kind" >> "$GITHUB_OUTPUT"
+
+  build-source:
+    needs: verify
+    if: needs.verify.outputs.release == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      # verify's commit, never the tag name, which can move.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: Read the governing pack (python_version)
+        id: pack
+        run: |
+          set -euo pipefail
+          py="$(python3 -I scripts/lib/specflow/packinfo.py --root . get python_version)"
+          if [ -z "$py" ]; then
+            echo "::error::the governing pack declares no python_version"
+            exit 1
+          fi
+          echo "python_version=$py" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ steps.pack.outputs.python_version }}
+
+      - name: Install Python dependencies
+        run: pip install --require-hashes -r scripts/requirements.txt
+
+      - name: Build the reproducible subset
+        env:
+          RELEASE_PARTS: reproducible
+          VERSION: ${{ needs.verify.outputs.version }}
+          STACK: ${{ needs.verify.outputs.stack }}
+          RELEASE_COMMIT: ${{ needs.verify.outputs.commit }}
+        run: |
+          set -euo pipefail
+          export DIST_DIR="$RUNNER_TEMP/dist"
+          bash "scripts/release-$STACK.sh"
+
+      - name: Compare the rows with the tagged notes
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          python3 -I scripts/lib/specflow/release_gate.py --version "$VERSION" \
+            --manifest "$RUNNER_TEMP/dist/manifest.json" --artifacts-only
+
+      - name: Smoke the template's archive
+        if: needs.verify.outputs.stack == 'template'
+        run: bash scripts/release-smoke.sh --stack template --dist "$RUNNER_TEMP/dist"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-source
+          path: ${{ runner.temp }}/dist
+          if-no-files-found: error
+          retention-days: 90
+
+  image:
+    needs: [verify, build-source]
+    if: needs.verify.outputs.release == 'true' && needs.verify.outputs.stack == 'python'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      superseded: ${{ steps.published.outputs.superseded }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: The stack's release action is installed
+        env:
+          STACK: ${{ needs.verify.outputs.stack }}
+        run: |
+          set -euo pipefail
+          if ! test -f .github/actions/release/action.yml; then
+            echo "::error::no release action for stack $STACK (.github/actions/release is installed by init from stacks/<stack>/release/: P6 Build 4 for python, Build 5 for tauri and flutter); nothing is published"
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-source
+          path: ${{ runner.temp }}/dist
+
+      - name: Image names
+        id: names
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$REPO" | tr '[:upper:]' '[:lower:]')"
+          {
+            echo "image=ghcr.io/$repo"
+            echo "source=https://github.com/$repo"
+          } >> "$GITHUB_OUTPUT"
+
+      # A read of the existing Release: no registry access.
+      - uses: ./.github/actions/release
+        id: prior
+        with:
+          part: image-prior
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/dist
+          image: ${{ steps.names.outputs.image }}
+          token: ${{ github.token }}
+
+      # Project code runs here (the build and the smoke): this step is given no credential.
+      - uses: ./.github/actions/release
+        if: steps.prior.outputs.prior == 'none'
+        with:
+          part: image-build
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/dist
+          image: ${{ steps.names.outputs.image }}
+          source-url: ${{ steps.names.outputs.source }}
+
+      # The registry's first use, after the build and the smoke.
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - uses: ./.github/actions/release
+        id: published
+        with:
+          part: image-publish
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/dist
+          image: ${{ steps.names.outputs.image }}
+          source-url: ${{ steps.names.outputs.source }}
+          prior: ${{ steps.prior.outputs.prior }}
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-image
+          path: ${{ runner.temp }}/dist/image.json
+          if-no-files-found: error
+          retention-days: 90
+
+  bundle:
+    needs: verify
+    if: needs.verify.outputs.release == 'true' && (needs.verify.outputs.stack == 'tauri' || needs.verify.outputs.stack == 'flutter')
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: The stack's release action is installed
+        env:
+          STACK: ${{ needs.verify.outputs.stack }}
+        run: |
+          set -euo pipefail
+          if ! test -f .github/actions/release/action.yml; then
+            echo "::error::no release action for stack $STACK (.github/actions/release is installed by init from stacks/<stack>/release/: P6 Build 4 for python, Build 5 for tauri and flutter); nothing is published"
+            exit 1
+          fi
+
+      - uses: ./.github/actions/release
+        with:
+          part: bundle
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/bundle
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-bundle-unsigned
+          path: ${{ runner.temp }}/bundle
+          if-no-files-found: error
+          retention-days: 90
+
+  # The only thing this job outputs is whether all five values exist; its body tests that they are non-empty. With
+  # signing: apple at the tag (R23) and not all five present, the job fails, so sign and verify-signed are skipped and
+  # publish (!failure()) publishes nothing — never an unsigned bundle against the committed policy (REQ-354, REQ-386).
+  signing-probe:
+    needs: verify
+    if: needs.verify.outputs.release == 'true' && (needs.verify.outputs.stack == 'tauri' || needs.verify.outputs.stack == 'flutter')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: release
+    outputs:
+      present: ${{ steps.probe.outputs.present }}
+    steps:
+      - name: Probe the signing secrets
+        id: probe
+        env:
+          SIGNING: ${{ needs.verify.outputs.signing }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          set +x
+          if [ -n "$APPLE_CERTIFICATE_P12" ] && [ -n "$APPLE_CERTIFICATE_PASSWORD" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_TEAM_ID" ] && [ -n "$APPLE_APP_PASSWORD" ]; then
+            present=true
+          else
+            present=false
+          fi
+          if [ "${SIGNING:-}" = apple ] && [ "$present" != true ]; then
+            echo "::error::.specflow.yml at the tag says signing: apple, but the release environment does not hold all five APPLE_* secrets: nothing is signed or published"
+            exit 1
+          fi
+          echo "present=$present" >> "$GITHUB_OUTPUT"
+
+  sign:
+    needs: [verify, bundle, signing-probe]
+    if: needs.verify.outputs.release == 'true' && (needs.verify.outputs.stack == 'tauri' || needs.verify.outputs.stack == 'flutter') && needs.signing-probe.outputs.present == 'true'
+    runs-on: macos-15
+    timeout-minutes: 45
+    environment: release
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: The stack's release action is installed
+        env:
+          STACK: ${{ needs.verify.outputs.stack }}
+        run: |
+          set -euo pipefail
+          if ! test -f .github/actions/release/action.yml; then
+            echo "::error::no release action for stack $STACK (.github/actions/release is installed by init from stacks/<stack>/release/: P6 Build 4 for python, Build 5 for tauri and flutter); nothing is published"
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-bundle-unsigned
+          path: ${{ runner.temp }}/bundle
+
+      # The certificate is decoded by python3 straight from the environment into a file only the runner user can read,
+      # imported into a keychain of its own (never the login keychain) under a random password held in this step's shell,
+      # and removed again. Nothing here is echoed.
+      - name: Create the signing keychain
+        id: keychain
+        env:
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          set +x
+          umask 077
+          kc="$RUNNER_TEMP/release-signing.keychain-db"
+          p12="$RUNNER_TEMP/release-signing.p12"
+          python3 -I - "$p12" <<'PY'
+          import base64, os, sys
+          with open(sys.argv[1], "wb") as f:
+              f.write(base64.b64decode(os.environ["APPLE_CERTIFICATE_P12"]))
+          PY
+          kcpass="$(openssl rand -hex 24)"
+          security create-keychain -p "$kcpass" "$kc"
+          security set-keychain-settings -lut 21600 "$kc"
+          security unlock-keychain -p "$kcpass" "$kc"
+          security import "$p12" -k "$kc" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$kcpass" "$kc"
+          args=("$kc")
+          while IFS= read -r k; do
+            k="$(printf '%s' "$k" | sed -e 's/^[[:space:]]*"//' -e 's/"[[:space:]]*$//')"
+            if [ -n "$k" ]; then
+              args+=("$k")
+            fi
+          done < <(security list-keychains -d user)
+          security list-keychains -d user -s "${args[@]}"
+          rm -f "$p12"
+          echo "keychain=$kc" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/release
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        with:
+          part: sign
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/bundle
+          keychain: ${{ steps.keychain.outputs.keychain }}
+
+      - name: Remove the signing keychain
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/release-signing.keychain-db" || true
+          rm -f "$RUNNER_TEMP/release-signing.p12"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-bundle-signed
+          path: ${{ runner.temp }}/bundle
+          if-no-files-found: error
+          retention-days: 90
+
+  verify-signed:
+    needs: [verify, sign]
+    if: needs.verify.outputs.release == 'true' && (needs.verify.outputs.stack == 'tauri' || needs.verify.outputs.stack == 'flutter')
+    runs-on: macos-15
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: The stack's release action is installed
+        env:
+          STACK: ${{ needs.verify.outputs.stack }}
+        run: |
+          set -euo pipefail
+          if ! test -f .github/actions/release/action.yml; then
+            echo "::error::no release action for stack $STACK (.github/actions/release is installed by init from stacks/<stack>/release/: P6 Build 4 for python, Build 5 for tauri and flutter); nothing is published"
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-bundle-signed
+          path: ${{ runner.temp }}/bundle
+
+      - uses: ./.github/actions/release
+        with:
+          part: verify-signed
+          version: ${{ needs.verify.outputs.version }}
+          tag: v${{ needs.verify.outputs.version }}
+          dist: ${{ runner.temp }}/bundle
+
+  # Runs when the stack jobs were skipped (a template, a python release with no bundle, an app release without the
+  # secrets) and never after a failure or a cancellation. Each part is downloaded only when its job succeeded.
+  publish:
+    needs: [verify, build-source, image, bundle, sign, verify-signed]
+    if: needs.verify.outputs.release == 'true' && !failure() && !cancelled()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.build-source.result == 'success'
+        with:
+          name: release-source
+          path: ${{ runner.temp }}/parts/source
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.image.result == 'success'
+        with:
+          name: release-image
+          path: ${{ runner.temp }}/parts/image
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.bundle.result == 'success'
+        with:
+          name: release-bundle-unsigned
+          path: ${{ runner.temp }}/parts/bundle-unsigned
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.verify-signed.result == 'success'
+        with:
+          name: release-bundle-signed
+          path: ${{ runner.temp }}/parts/bundle-signed
+
+      # The remote tag is read again first: a tag that moved since verify, or was replaced by another tag object on the
+      # same commit, publishes nothing. The draft becomes a Release only once every asset is on it.
+      - name: Publish the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.verify.outputs.version }}
+          TAG: v${{ needs.verify.outputs.version }}
+          COMMIT: ${{ needs.verify.outputs.commit }}
+          TAG_OBJECT: ${{ needs.verify.outputs.tag_object }}
+          ANCHOR: ${{ needs.verify.outputs.anchor }}
+          TAG_KIND: ${{ needs.verify.outputs.tag_kind }}
+        run: |
+          set -euo pipefail
+          bash scripts/release-publish.sh --version "$VERSION" --tag "$TAG" --commit "$COMMIT" --tag-object "$TAG_OBJECT" --anchor "$ANCHOR" --tag-kind "$TAG_KIND" \
+            --parts "$RUNNER_TEMP/parts" --notes "docs/releases/$VERSION-notes.md"
+
+  # A failure here is the action's warning: the Release already exists.
+  prune:
+    needs: [verify, image, publish]
+    if: needs.verify.outputs.stack == 'python' && needs.publish.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+
+      - name: The stack's release action is installed
+        env:
+          STACK: ${{ needs.verify.outputs.stack }}
+        run: |
+          set -euo pipefail
+          if ! test -f .github/actions/release/action.yml; then
+            echo "::error::no release action for stack $STACK (.github/actions/release is installed by init from stacks/<stack>/release/: P6 Build 4 for python, Build 5 for tauri and flutter); nothing is published"
+            exit 1
+          fi
+
+      - name: Image names
+        id: names
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$REPO" | tr '[:upper:]' '[:lower:]')"
+          echo "image=ghcr.io/$repo" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/release
+        with:
+          part: prune
+          image: ${{ steps.names.outputs.image }}
+          superseded: ${{ needs.image.outputs.superseded }}
+          token: ${{ github.token }}

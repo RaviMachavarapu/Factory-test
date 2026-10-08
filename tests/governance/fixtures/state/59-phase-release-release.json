@@ -1,0 +1,21 @@
+{
+  "about": "State table, regulated phase/release: no docs derives release.",
+  "branch": {
+    "kind": "PhaseRelease"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "release",
+    "phase": "release",
+    "step": {
+      "kind": "RunRelease"
+    },
+    "open_lanes": []
+  }
+}

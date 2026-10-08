@@ -1,0 +1,9 @@
+# SpecFlow release signers (REQ-383; P6 R3). A release tag v<version> is verified (git verify-tag) against this file as
+# committed at the anchor - the newest earlier SSH-signed v<X.Y.Z> tag among the tag's strict ancestors, else trust on
+# first use - never against the current tree; unsigned, lightweight and GPG-signed candidates are passed over, while an
+# SSH-signed one off main's first-parent chain is refused (anchor-off-main), never passed over. One key per line:
+# <your git email> namespaces="git" <key type> <base64 public key>; the email is spelled exactly as your git config
+# user.email (the tagger is bound to the key's principal, case-sensitively). Add a key in a PR: it is trusted
+# from the release after the first one tagged on a commit that lists it. Public keys only, never a private key.
+# Remove a key here and list it in .github/revoked_signers to revoke it.
+ashwin.pingali@geninspired.com namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILxL9UeIyRi7aUFO6syF2E4oAf56uKGQbAQCbuBKhdzW

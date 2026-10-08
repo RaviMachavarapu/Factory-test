@@ -1,0 +1,25 @@
+{
+  "about": "The factory's own history: impl/plan-5-orchestrator parses as Impl(5, orchestrator); with a source diff and no PR it derives CreatePr.",
+  "branch": {
+    "kind": "Impl",
+    "plan": "5",
+    "name": "orchestrator"
+  },
+  "branch_name": "impl/plan-5-orchestrator",
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_source_diff": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "impl",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

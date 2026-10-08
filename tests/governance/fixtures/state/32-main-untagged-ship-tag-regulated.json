@@ -1,0 +1,23 @@
+{
+  "about": "Precedence 3: the same on the regulated path is in the release lane.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "untagged_ship": "0.1.0"
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "release",
+    "phase": "tag",
+    "step": {
+      "kind": "TagRelease",
+      "version": "0.1.0"
+    },
+    "open_lanes": []
+  }
+}

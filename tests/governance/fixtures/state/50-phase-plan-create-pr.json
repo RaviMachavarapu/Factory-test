@@ -1,0 +1,24 @@
+{
+  "about": "State table: plan and analysis present derive open-pr, CreatePr.",
+  "branch": {
+    "kind": "PhasePlan",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_plan": true,
+    "analyze_ok": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "plan",
+    "phase": "open-pr",
+    "step": {
+      "kind": "CreatePr"
+    },
+    "open_lanes": []
+  }
+}

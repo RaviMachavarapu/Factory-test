@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- REQ-352, REQ-386 (P6 R33, P7 R7): the fallback entitlements for the Tauri app's hardened-runtime signature.
+     release-sign.sh signs with the committed set: the file src-tauri/tauri.conf.json names in
+     bundle.macOS.entitlements (the entitlements tauri's own bundler would apply, so none is dropped), and this file,
+     the fallback, only when the project names none. The set the unsigned app embeds is compared, never used: a key
+     it carries that the committed set lacks stops the signing. The
+     system WKWebView renders the UI in its own process, so the app itself needs no JIT or unsigned-memory entitlement.
+     A notarized app must not carry the debugger entitlement (get-task-allow): release-sign.sh removes it from the
+     committed file it signs with. -->
+<plist version="1.0">
+<dict/>
+</plist>

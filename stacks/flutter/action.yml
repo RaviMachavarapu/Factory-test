@@ -1,0 +1,74 @@
+# flutter stack pack — composite toolchain action (REQ-303).
+# Installs the pinned toolchain and the security floor tools for a
+# flutter-stack instance (REQ-330): gitleaks, osv-scanner, and a
+# checksum-pinned macOS Dafny when proofs are present. The Flutter SDK is
+# verified by its frameworkRevision (a git commit id), not by the movable
+# version tag — a tag that has moved fails this action's revision check
+# (dfe-4).
+name: "SpecFlow flutter toolchain"
+description: "Set up Python and the pinned Flutter SDK for a flutter-stack instance."
+inputs:
+  flutter_version:
+    description: "Flutter version tag to clone (must resolve to flutter_revision)"
+    required: false
+    default: "3.47.6"
+  flutter_revision:
+    description: "Pinned Flutter SDK frameworkRevision (git commit id)"
+    required: false
+    default: "5fc346839b5d0eef006ed8404392afb4dfae428d"
+runs:
+  using: "composite"
+  steps:
+    - name: Cache the floor tool assets
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/specflow-tools
+        key: ${{ runner.os }}-specflow-tools-${{ hashFiles('scripts/pinned-tools.yml') }}
+    - name: Floor tools (gitleaks, osv-scanner)
+      shell: bash
+      run: |
+        bash scripts/install-pinned-tool.sh gitleaks osv-scanner --dest "$HOME/.local/specflow-bin"
+        echo "$HOME/.local/specflow-bin" >> "$GITHUB_PATH"
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: "3.12"
+    - name: Install gate dependencies
+      shell: bash
+      run: pip install --require-hashes -r scripts/requirements.txt
+    - name: Cache the Flutter SDK
+      id: flutter-cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ runner.tool_cache }}/flutter-${{ inputs.flutter_revision }}
+        key: flutter-${{ inputs.flutter_revision }}
+    - name: Clone the pinned Flutter SDK (cache miss)
+      if: steps.flutter-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        git clone --depth 1 --branch "${{ inputs.flutter_version }}" \
+          https://github.com/flutter/flutter.git \
+          "${{ runner.tool_cache }}/flutter-${{ inputs.flutter_revision }}"
+    - name: Verify the SDK is at the pinned revision (a moved tag fails here)
+      shell: bash
+      run: |
+        got="$(git -C "${{ runner.tool_cache }}/flutter-${{ inputs.flutter_revision }}" rev-parse HEAD)"
+        if [[ "$got" != "${{ inputs.flutter_revision }}" ]]; then
+          echo "flutter action: ${{ inputs.flutter_version }} resolved to $got, not the pinned ${{ inputs.flutter_revision }}" >&2
+          exit 1
+        fi
+    - name: Add Flutter to PATH
+      shell: bash
+      run: echo "${{ runner.tool_cache }}/flutter-${{ inputs.flutter_revision }}/bin" >> "$GITHUB_PATH"
+    - name: Precache the macOS artifacts
+      shell: bash
+      run: flutter precache --macos
+    - name: Re-verify the SDK revision after precache
+      shell: bash
+      run: |
+        flutter --version --machine | grep -q "\"frameworkRevision\": \"${{ inputs.flutter_revision }}\""
+    - name: Install Dafny (if proofs are present)
+      if: hashFiles('verification/**/*.dfy') != ''
+      shell: bash
+      run: |
+        bash scripts/install-pinned-tool.sh dafny --dest "$RUNNER_TEMP/dafny-dist"
+        echo "$RUNNER_TEMP/dafny-dist/dafny" >> "$GITHUB_PATH"

@@ -1,0 +1,26 @@
+{
+  "about": "The back-edge, regulated: impl/sec-<id> implements the security fix.",
+  "branch": {
+    "kind": "ImplSec",
+    "id": "SEC-004"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "impl",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "SecFix",
+        "id": "SEC-004"
+      }
+    },
+    "open_lanes": []
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "rule": "an npm lockfile that drops an entry and a dependency name and adds nothing: exempt (R10)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "package-lock.json"
+    ],
+    "contents": {
+      "package-lock.json": {
+        "base": "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"app\"\n    },\n    \"node_modules/lodash\": {\n      \"version\": \"4.17.20\",\n      \"resolved\": \"https://registry.npmjs.org/lodash/-/lodash-4.17.20.tgz\",\n      \"dependencies\": {\n        \"a\": \"^1.0.0\"\n      }\n    },\n    \"node_modules/a\": {\n      \"version\": \"1.0.0\",\n      \"resolved\": \"https://registry.npmjs.org/a/-/a-1.0.0.tgz\"\n    }\n  }\n}\n",
+        "head": "{\n  \"name\": \"app\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"app\"\n    },\n    \"node_modules/lodash\": {\n      \"version\": \"4.17.21\",\n      \"resolved\": \"https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz\",\n      \"dependencies\": {}\n    }\n  }\n}\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "approve",
+    "reason": "exempt-dependabot",
+    "comment_id": null
+  }
+}

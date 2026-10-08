@@ -1,0 +1,23 @@
+{
+  "about": "State table: a brainstorm present derives specify.",
+  "branch": {
+    "kind": "PhaseSpec",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "spec",
+    "phase": "specify",
+    "step": {
+      "kind": "RunSpecify"
+    },
+    "open_lanes": []
+  }
+}

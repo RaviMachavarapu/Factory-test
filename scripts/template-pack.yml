@@ -1,0 +1,29 @@
+stack: template
+# P6 R15 (F36): the Python the template source's CI jobs and release-build.yml set up (ci.yml's marker carries the same value).
+python_version: "3.12"
+# P6 R28 (the maintainer's decision, 2026-10-01): the tag-time re-check (attestation.py release-check) lists, and does not judge,
+# every first-parent commit before this one — the merges before the repository's transfer to Apps-Consultants (PR #41, the
+# first merge on or after 2026-09-28). Read at the tag's tree; introduced once and never moved: once an earlier release tag carries
+# it, release-check refuses any other value (exit 2), and an instance's pack may not carry it (dfe-12).
+attestation_since: e88e8361ef913ca7ac7475e506610003be7574bb
+# REQ-321 (R15): the template source's own test-first pack — read by
+# packinfo.py only when the tree has no .specflow.yml and no .stack (the
+# template source itself, not an instance). init-project.sh removes this
+# file when it copies a stack's pack.yml to .specflow/pack.yml (R15), so an
+# instance never reads it.
+#
+# Fixtures and the harness are never a source root's "test": tests/governance/lib/**
+# and tests/governance/fixtures/** are test_globs (never source, never a
+# test_first_rules test side either — a fixture or lib/ edit alone satisfies
+# no rule).  scripts/**, stacks/**, .claude/** and .github/** are each their
+# own source root because tdd.md scopes governance tests as the test layer
+# for scripts, packs, .claude/ and CI; verification/ holds proofs, not
+# source; docs/, schemas/ and templates/ are documents, not source.
+source_roots: [scripts, stacks, .claude, .github, src]
+test_globs: [tests/governance/test_*.sh, tests/governance/lib/**, tests/governance/fixtures/**, tests/**/test_*.py]
+test_first_rules: ["src/** -> tests/**/test_*.py", "scripts/** -> tests/governance/test_*.sh | tests/**/test_*.py", "stacks/** -> tests/governance/test_*.sh | tests/**/test_*.py", ".claude/** -> tests/governance/test_*.sh | tests/**/test_*.py", ".github/** -> tests/governance/test_*.sh | tests/**/test_*.py"]
+# Dependency manifests/lockfiles (Dependabot and the packs edit these) and
+# non-instruction Markdown under .github/ are never source. Model-instruction
+# Markdown (.claude/**, any CLAUDE.md, stacks/*/overlay/**, stacks/*/skeleton/**
+# — gate code under REQ-310) stays source and is NOT listed here.
+non_source: [scripts/requirements.in, scripts/requirements.txt, stacks/*/skeleton/requirements.in, stacks/*/skeleton/requirements.txt, **/*.lock, **/package.json, **/package-lock.json, **/pubspec.yaml, **/Cargo.toml, .github/**/*.md]

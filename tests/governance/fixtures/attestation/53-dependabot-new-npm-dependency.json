@@ -1,0 +1,49 @@
+{
+  "rule": "package.json moves react's version and adds a dependency the base does not list: NOT exempt (content rule: only versions of the base's dependencies move)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "package.json"
+    ],
+    "contents": {
+      "package.json": {
+        "base": "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"react\": \"^18.2.0\"\n  }\n}\n",
+        "head": "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"react\": \"^18.3.1\",\n    \"evil-typo\": \"1.0.0\"\n  }\n}\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "about": "A critical base vector (9.3) with the Threat metric E:U appended scores 8.1 (high); recorded as high it would dodge the critical band. A non-base metric is a precondition violation (R9).",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "high",
+      "cvss_vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:U"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": "2026-12-01",
+      "rationale": "fixture rationale"
+    }
+  ],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "error": "ValueError"
+  }
+}

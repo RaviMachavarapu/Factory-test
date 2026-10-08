@@ -1,0 +1,74 @@
+{
+  "rule": "verified commits touching every pack's lockfile with version-only edits: exempt",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "package.json",
+      "package-lock.json",
+      "src-tauri/Cargo.toml",
+      "src-tauri/Cargo.lock",
+      "scripts/requirements.in",
+      "pubspec.lock"
+    ],
+    "contents": {
+      "package.json": {
+        "base": "{\"name\": \"x\", \"version\": \"1.0.0\", \"dependencies\": {\"foo\": \"^1.0.0\"}}",
+        "head": "{\"name\": \"x\", \"version\": \"1.0.0\", \"dependencies\": {\"foo\": \"^1.0.1\"}}"
+      },
+      "package-lock.json": {
+        "base": "{\"packages\": {\"node_modules/foo\": {\"version\": \"1.0.0\", \"resolved\": \"https://registry.npmjs.org/foo/-/foo-1.0.0.tgz\"}}}",
+        "head": "{\"packages\": {\"node_modules/foo\": {\"version\": \"1.0.1\", \"resolved\": \"https://registry.npmjs.org/foo/-/foo-1.0.1.tgz\"}}}"
+      },
+      "src-tauri/Cargo.toml": {
+        "base": "[dependencies]\nserde = \"1.0.0\"\n",
+        "head": "[dependencies]\nserde = \"1.0.1\"\n"
+      },
+      "src-tauri/Cargo.lock": {
+        "base": "[[package]]\nname = \"serde\"\nversion = \"1.0.0\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n",
+        "head": "[[package]]\nname = \"serde\"\nversion = \"1.0.1\"\nsource = \"registry+https://github.com/rust-lang/crates.io-index\"\n"
+      },
+      "scripts/requirements.in": {
+        "base": "pytest>=9,<10\n",
+        "head": "pytest>=9.1,<10\n"
+      },
+      "pubspec.lock": {
+        "base": "packages:\n  foo:\n    version: \"1.0.0\"\n    source: hosted\n    url: \"https://pub.dev\"\n",
+        "head": "packages:\n  foo:\n    version: \"1.0.1\"\n    source: hosted\n    url: \"https://pub.dev\"\n"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "approve",
+    "reason": "exempt-dependabot",
+    "comment_id": null
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "about": "Precedence 4: an existing spec with no brainstorm does not send the user back; first missing after the last present is plan.",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_spec": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "plan",
+    "step": {
+      "kind": "RunPlan"
+    },
+    "open_lanes": []
+  }
+}

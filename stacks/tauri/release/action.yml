@@ -1,0 +1,202 @@
+# REQ-352, REQ-386, REQ-390 (P6 R33, R35): the tauri stack's release action, installed by init as
+# .github/actions/release/ and called by release.yml's bundle, sign and verify-signed jobs (a fixed part: input each).
+# bundle builds the macOS .dmg with the pack's pinned toolchain and starts it (the 60 s smoke); sign signs and notarizes
+# it through scripts/release-sign.sh with the project's entitlements (the file beside this one when the project has
+# none); verify-signed checks the signed bundle with no secret. The Apple values reach sign through the calling step's
+# environment, never an input; every other value reaches a run: block through env: only.
+# release.yml calls this one ./.github/actions/release from its python jobs too (image, prune: never run for this
+# stack), so the inputs and outputs those jobs use are declared here, optional and ignored, for actionlint.
+name: "SpecFlow tauri release"
+description: "The tauri release parts: bundle, sign, verify-signed."
+inputs:
+  part:
+    description: "bundle | sign | verify-signed"
+    required: true
+  version:
+    description: "The release version (X.Y.Z)"
+    required: false
+    default: ""
+  tag:
+    description: "The release tag (vX.Y.Z)"
+    required: false
+    default: ""
+  dist:
+    description: "The directory the part reads and writes (under RUNNER_TEMP); every part of this action requires it"
+    required: false
+    default: ""
+  keychain:
+    description: "sign: the temporary keychain's path (already on the user search list)"
+    required: false
+    default: ""
+  image:
+    description: "The python stack's image jobs only; ignored by this action"
+    required: false
+    default: ""
+  token:
+    description: "The python stack's image jobs only; ignored by this action"
+    required: false
+    default: ""
+  source-url:
+    description: "The python stack's image jobs only; ignored by this action"
+    required: false
+    default: ""
+  prior:
+    description: "The python stack's image jobs only; ignored by this action"
+    required: false
+    default: ""
+  superseded:
+    description: "The python stack's prune job only; ignored by this action"
+    required: false
+    default: ""
+outputs:
+  prior:
+    description: "The python stack's image jobs only; always empty here"
+    value: ""
+  superseded:
+    description: "The python stack's image jobs only; always empty here"
+    value: ""
+runs:
+  using: "composite"
+  steps:
+    - name: Unknown part
+      if: inputs.part != 'bundle' && inputs.part != 'sign' && inputs.part != 'verify-signed'
+      shell: bash
+      env:
+        PART: ${{ inputs.part }}
+      run: |
+        echo "::error::release action: unknown part $PART for tauri"
+        exit 1
+    - name: The part has its directory
+      shell: bash
+      env:
+        PART: ${{ inputs.part }}
+        DIST: ${{ inputs.dist }}
+      run: |
+        if [ -z "$DIST" ]; then
+          echo "::error::release action: part $PART requires dist"
+          exit 1
+        fi
+
+    # bundle: the pack's pinned toolchain set up here with no cache — never the toolchain action, whose floor-tool and
+    # binary caches main's CI runs write (final review, finding 2) — the package registries cached (never a target or
+    # build directory: a bundle is judged by its smoke and its signature, whatever a cache held), the hook's bundle
+    # part, the smoke.
+    - name: Read the pack's pinned toolchain
+      id: pins
+      if: inputs.part == 'bundle'
+      shell: bash
+      run: |
+        set -euo pipefail
+        for k in python_version node_version rust_version; do
+          v="$(python3 -I scripts/lib/specflow/packinfo.py --root . get "$k")"
+          if [ -z "$v" ]; then echo "::error::release action: the pack has no $k" >&2; exit 1; fi
+          echo "$k=$v" >> "$GITHUB_OUTPUT"
+        done
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      if: inputs.part == 'bundle'
+      with:
+        python-version: ${{ steps.pins.outputs.python_version }}
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      if: inputs.part == 'bundle'
+      with:
+        node-version: ${{ steps.pins.outputs.node_version }}
+        # v5+ caches automatically when package.json names npm as its packageManager; a release build restores no cache.
+        package-manager-cache: false
+    - name: Install the pinned Rust toolchain
+      if: inputs.part == 'bundle'
+      shell: bash
+      env:
+        RUST: ${{ steps.pins.outputs.rust_version }}
+      run: |
+        set -euo pipefail
+        rustup toolchain install "$RUST" --profile minimal
+        rustup default "$RUST"
+    # The registry's index and .crate archives and the git databases only (cargo's own CI guidance): never
+    # registry/src or git/checkouts, which cargo re-extracts from them, and never ~/.cargo/bin.
+    - name: Cache the cargo registry archives and git databases
+      if: inputs.part == 'bundle'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git/db
+        key: ${{ runner.os }}-release-tauri-registry-${{ hashFiles('src-tauri/Cargo.lock') }}
+    - name: Install the locked dependencies (the hook builds offline)
+      if: inputs.part == 'bundle'
+      shell: bash
+      run: |
+        set -euo pipefail
+        npm ci
+        cargo fetch --locked --manifest-path src-tauri/Cargo.toml
+    - name: Build the bundle
+      if: inputs.part == 'bundle'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        DIST_DIR: ${{ inputs.dist }}
+        RELEASE_PARTS: bundle
+      run: |
+        set -euo pipefail
+        mkdir -p "$DIST_DIR"
+        bash scripts/release-tauri.sh
+    - name: Smoke the bundle (60 s)
+      if: inputs.part == 'bundle'
+      shell: bash
+      env:
+        DIST: ${{ inputs.dist }}
+      run: |
+        set -euo pipefail
+        bash scripts/release-smoke.sh --stack tauri --dist "$DIST"
+
+    # sign: APPLE_ID, APPLE_TEAM_ID and APPLE_APP_PASSWORD are in this step's environment from the calling job's step.
+    # release-sign.sh signs with src-tauri/tauri.conf.json's bundle.macOS.entitlements when the project sets one, else
+    # with the entitlements file beside this action (final review, finding 1).
+    - name: Sign and notarize the bundle
+      if: inputs.part == 'sign'
+      shell: bash
+      env:
+        DIST: ${{ inputs.dist }}
+        RELEASE_SIGN_KEYCHAIN: ${{ inputs.keychain }}
+      run: |
+        set +x
+        set -euo pipefail
+        bash scripts/release-sign.sh --stack tauri --dist "$DIST" --entitlements "$GITHUB_ACTION_PATH/entitlements.plist"
+
+    # verify-signed: no secret. The signature, Gatekeeper's verdict, the notarization ticket, then the smoke on the
+    # signed bundle itself.
+    - name: Verify the signed bundle
+      if: inputs.part == 'verify-signed'
+      shell: bash
+      env:
+        DIST: ${{ inputs.dist }}
+      run: |
+        set -euo pipefail
+        python3 -I - "$DIST/manifest.json" <<'PY'
+        import json, sys
+        m = json.load(open(sys.argv[1]))
+        bundle = [a for a in m["artifacts"] if a.get("kind") == "bundle"]
+        if len(bundle) != 1 or bundle[0].get("signed") is not True or m.get("signed") is not True:
+            sys.exit("verify-signed: the manifest must hold one bundle entry with signed: true")
+        PY
+        shopt -s nullglob
+        dmgs=("$DIST"/*.dmg)
+        if [ "${#dmgs[@]}" != 1 ]; then echo "verify-signed: expected one .dmg in $DIST" >&2; exit 1; fi
+        dmg="${dmgs[0]}"
+        mnt="$(mktemp -d)"
+        trap 'hdiutil detach "$mnt" -force >/dev/null 2>&1 || true' EXIT
+        hdiutil attach -nobrowse -readonly -mountpoint "$mnt" "$dmg" >/dev/null
+        apps=("$mnt"/*.app)
+        if [ "${#apps[@]}" != 1 ]; then echo "verify-signed: expected one .app in the dmg" >&2; exit 1; fi
+        codesign --verify --deep --strict --verbose=2 "${apps[0]}"
+        spctl -a -vv "${apps[0]}"
+        spctl -a -vv -t open --context context:primary-signature "$dmg"
+        xcrun stapler validate "$dmg"
+    - name: Smoke the signed bundle (60 s)
+      if: inputs.part == 'verify-signed'
+      shell: bash
+      env:
+        DIST: ${{ inputs.dist }}
+      run: |
+        set -euo pipefail
+        bash scripts/release-smoke.sh --stack tauri --dist "$DIST"

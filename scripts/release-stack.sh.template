@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# Per-stack RELEASE hook contract.
+# Stack packs implement this contract at stacks/<stack>/release.sh; init
+# copies it to scripts/release-<stack>.sh (executable) for the instance.
+# Implements REQ-110 (article art-release-readiness); REQ-305 and REQ-384 as
+# extended by P6 (R18): the committed tree, the notes' epoch, schema 2.
+#
+# Contract:
+#   Inputs (env):
+#     VERSION          - semver string (e.g., 1.4.0)
+#     DIST_DIR         - absolute path to write artifacts under
+#     RELEASE_PARTS    - optional: all (default) | reproducible | bundle. The
+#                        bundle part exists for app stacks only.
+#     RELEASE_COMMIT   - optional, default HEAD: the commit whose tree is built
+#                        (the PR head SHA at PR time).
+#     SOURCE_DATE_EPOCH - optional. Else 00:00:00 UTC of the notes' date:
+#                        (docs/releases/<VERSION>-notes.md at RELEASE_COMMIT).
+#                        With neither the notes nor the variable: exit 2.
+#   Reproducible part:
+#     - Exports RELEASE_COMMIT's tree (never the working tree) with git archive
+#       (git -c tar.umask=0022 -c core.autocrlf=false archive), excluding
+#       docs/releases and docs/security, into a temporary directory and builds
+#       there, so an artifact never contains its own checksum and the ship
+#       PR's head and the commit main gets give the same bytes.
+#   Bundle part (app stacks only):
+#     - Builds in the checkout it runs in (its dependencies installed there);
+#       never reproducible, never transcribed into the notes.
+#   Outputs:
+#     - The artifacts of the parts asked for under $DIST_DIR/.
+#     - $DIST_DIR/manifest.json, schema specflow-manifest/2: each artifact with
+#       sha256, size, kind (source-archive | sdist | wheel | bundle) and
+#       reproducible; a bundle also carries signed. Written through
+#       scripts/lib/specflow/release_manifest.py write.
+#   Exit code:
+#     0 on success; non-zero blocks the RELEASE phase (2: no notes and no
+#     SOURCE_DATE_EPOCH, or a RELEASE_COMMIT that names no commit here).
+#   Constraints:
+#     - No outbound network calls (enforced by code review).
+#     - Pure local packaging. Publishing (PyPI / npm / etc.) is a separate step.
+#
+# This stub is a working example of the contract: it enforces the epoch rule
+# and writes one artifact, the source archive of the committed tree.
+set -euo pipefail
+
+: "${VERSION:?VERSION env var required}"
+: "${DIST_DIR:?DIST_DIR env var required}"
+PARTS="${RELEASE_PARTS:-all}"
+COMMIT="${RELEASE_COMMIT:-HEAD}"
+case "$PARTS" in all | reproducible | bundle) ;; *) echo "release: RELEASE_PARTS must be all, reproducible or bundle" >&2; exit 2 ;; esac
+if [ "$PARTS" = bundle ]; then echo "release: no bundle in this stub" >&2; exit 0; fi
+
+TOP="$(git rev-parse --show-toplevel)"
+LIB="$TOP/scripts/lib/specflow"
+if ! git rev-parse -q --verify "$COMMIT^{commit}" >/dev/null; then
+  echo "RELEASE_COMMIT $COMMIT is not a commit in this repository (SPECFLOW_HEAD_SHA set wrongly?)" >&2
+  exit 2
+fi
+if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
+  EPOCH="$SOURCE_DATE_EPOCH"
+else
+  NOTES_TMP="$(mktemp)"
+  trap 'rm -f "$NOTES_TMP"' EXIT
+  if ! git show "$COMMIT:docs/releases/$VERSION-notes.md" > "$NOTES_TMP" 2>/dev/null; then
+    echo "no docs/releases/$VERSION-notes.md: run /release first, or set SOURCE_DATE_EPOCH" >&2
+    exit 2
+  fi
+  EPOCH="$(python3 "$LIB/release_manifest.py" epoch --notes "$NOTES_TMP")" || exit 2
+fi
+
+# The archive and its in-tar prefix are named after the repository — remote.origin.url's last path component without
+# .git (https://host/o/<name>.git, git@host:o/<name>.git, a local /path/<name>.git) — never the checkout directory, so a
+# laptop clone under another name gives CI's bytes; with no origin, the directory's name is the fallback.
+NAME="$(git config --get remote.origin.url 2>/dev/null || true)"
+NAME="${NAME%/}"; NAME="${NAME##*/}"; NAME="${NAME##*:}"; NAME="${NAME%.git}"
+[ -n "$NAME" ] || NAME="$(basename "$TOP")"
+TREE="$(git rev-parse "$COMMIT^{tree}")"
+mkdir -p "$DIST_DIR"
+rm -f "$DIST_DIR/$NAME-$VERSION-source.tar" "$DIST_DIR/manifest.json"
+git -c tar.umask=0022 -c core.autocrlf=false archive --format=tar --prefix="$NAME-$VERSION/" --mtime="@$EPOCH" \
+  "$TREE" -- . ':(exclude)docs/releases' ':(exclude)docs/security' > "$DIST_DIR/$NAME-$VERSION-source.tar"
+
+python3 - "$LIB" "$DIST_DIR" "$VERSION" "$EPOCH" "$TREE" "$NAME" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import release_manifest as m
+lib, dist, version, epoch, tree, name = sys.argv[1:7]
+m.write(dist, version, "stub", int(epoch), tree, [(f"{name}-{version}-source.tar", "source-archive", True)])
+print("Wrote manifest with 1 artifact(s)")
+PY

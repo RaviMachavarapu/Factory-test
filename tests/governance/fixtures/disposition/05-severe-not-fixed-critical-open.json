@@ -1,0 +1,33 @@
+{
+  "about": "A critical finding left open: rule 2.",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "critical",
+      "cvss_vector": "@critical"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "open",
+      "owner": "",
+      "expiry": null,
+      "rationale": "",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": false,
+    "violations": [
+      [
+        "SEC-001",
+        "severe_not_fixed"
+      ]
+    ]
+  }
+}

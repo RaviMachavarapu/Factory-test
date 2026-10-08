@@ -1,0 +1,24 @@
+{
+  "about": "State table: an untagged spec has no architecture entry, so the next phase is plan.",
+  "branch": {
+    "kind": "Design",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_brainstorm": true,
+    "has_spec": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "design",
+    "phase": "plan",
+    "step": {
+      "kind": "RunPlan"
+    },
+    "open_lanes": []
+  }
+}

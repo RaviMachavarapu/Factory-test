@@ -1,0 +1,18 @@
+{
+  "about": "A finding whose claimed severity does not match its CVSS vector's band: precondition violation (R9).",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "critical",
+      "cvss_vector": "@low"
+    }
+  ],
+  "disposition": [],
+  "prior": [],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "error": "ValueError"
+  }
+}

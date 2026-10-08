@@ -1,0 +1,43 @@
+{
+  "rule": "a REQUEST_CHANGES marker for the head whose recorded base gives another merge base (a retargeted PR) still counts as a request for changes (request-changes-base-mismatch): an older APPROVE whose base matches never wins over it; base-mismatch only refuses the acceptance of an APPROVE (PR #48 verifier code-mode high)",
+  "context": {
+    "head": "1111111111111111111111111111111111111111",
+    "prompt_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "solo": true,
+    "pr_author": "alice",
+    "required_mode": "full",
+    "bases": {
+      "3333333333333333333333333333333333333333": true,
+      "5555555555555555555555555555555555555555": false
+    }
+  },
+  "comments": [
+    {
+      "id": 1,
+      "user": {
+        "login": "alice"
+      },
+      "author_association": "OWNER",
+      "created_at": "2026-09-29T10:00:00Z",
+      "updated_at": "2026-09-29T10:00:00Z",
+      "html_url": "https://github.com/o/r/pull/7#issuecomment-1",
+      "body": "<!-- specflow-verifier:full sha:1111111111111111111111111111111111111111 base:3333333333333333333333333333333333333333 prompt_sha256:4444444444444444444444444444444444444444444444444444444444444444 model:opus verdict:APPROVE digest:1cbe7522926bd74f96b4cfdf97d2fa5ff1d8efc18a727ae3d0dea8f8c57b0b6b origin:headless -->\n## SpecFlow verifier (full mode)\n\nNo findings.\nAPPROVE"
+    },
+    {
+      "id": 2,
+      "user": {
+        "login": "alice"
+      },
+      "author_association": "OWNER",
+      "created_at": "2026-09-29T10:01:00Z",
+      "updated_at": "2026-09-29T10:01:00Z",
+      "html_url": "https://github.com/o/r/pull/7#issuecomment-2",
+      "body": "<!-- specflow-verifier:full sha:1111111111111111111111111111111111111111 base:5555555555555555555555555555555555555555 prompt_sha256:4444444444444444444444444444444444444444444444444444444444444444 model:opus verdict:REQUEST_CHANGES digest:e13170b1e9a607b67609411314604dc112361da50214d954bca046c5c9fe6f1f origin:headless -->\n## SpecFlow verifier (full mode)\n\nFindings noted.\nREQUEST_CHANGES"
+    }
+  ],
+  "expect": {
+    "state": "request_changes",
+    "reason": "request-changes-base-mismatch",
+    "comment_id": 2
+  }
+}

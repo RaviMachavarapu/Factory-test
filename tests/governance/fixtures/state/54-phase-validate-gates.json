@@ -1,0 +1,21 @@
+{
+  "about": "State table, regulated phase/validate: gates not passing derives gates.",
+  "branch": {
+    "kind": "PhaseValidate"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "validate",
+    "phase": "gates",
+    "step": {
+      "kind": "RunGates"
+    },
+    "open_lanes": []
+  }
+}

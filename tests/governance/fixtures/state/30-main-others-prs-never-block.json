@@ -1,0 +1,37 @@
+{
+  "about": "OtherUsersPrsNeverBlock: another user's open PR #9 is listed, never checked out; main is idle.",
+  "lemma": "Fixture30",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [
+    {
+      "number": 9,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": false
+    }
+  ],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "idle",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeDesign"
+      }
+    },
+    "open_lanes": [
+      9
+    ]
+  }
+}

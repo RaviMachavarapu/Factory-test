@@ -1,0 +1,45 @@
+{
+  "about": "A due prior high, current entry still open (not fixed): rule 4 (and rule 2, since it is also unfixed).",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "high",
+      "cvss_vector": "@high"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "open",
+      "owner": "",
+      "expiry": null,
+      "rationale": "",
+      "reclassified_by": null
+    }
+  ],
+  "prior": [
+    {
+      "id": "SEC-001",
+      "severity": "high",
+      "status": "accepted",
+      "expiry": "2026-10-27",
+      "version": "1.0.0"
+    }
+  ],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": false,
+    "violations": [
+      [
+        "SEC-001",
+        "carry_forward"
+      ],
+      [
+        "SEC-001",
+        "severe_not_fixed"
+      ]
+    ]
+  }
+}

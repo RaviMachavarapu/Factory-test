@@ -1,0 +1,23 @@
+{
+  "about": "State table: a plan present derives analyze.",
+  "branch": {
+    "kind": "PhasePlan",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "has_plan": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "plan",
+    "phase": "analyze",
+    "step": {
+      "kind": "RunAnalyze"
+    },
+    "open_lanes": []
+  }
+}

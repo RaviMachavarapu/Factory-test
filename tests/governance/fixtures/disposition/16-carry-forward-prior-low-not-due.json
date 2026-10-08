@@ -1,0 +1,21 @@
+{
+  "about": "A prior low entry is never due, whatever its status: rule 4 does not apply.",
+  "review": [],
+  "disposition": [],
+  "prior": [
+    {
+      "id": "SEC-001",
+      "severity": "low",
+      "status": "accepted",
+      "expiry": null,
+      "version": "1.0.0"
+    }
+  ],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": true,
+    "violations": []
+  }
+}

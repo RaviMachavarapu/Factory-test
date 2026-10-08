@@ -1,0 +1,43 @@
+{
+  "about": "UnknownBranchNeverMerges (dfe-7): an unknown branch whose PR #7 is approved and human-approved is explained, never merged.",
+  "lemma": "Fixture62",
+  "branch": {
+    "kind": "Unknown"
+  },
+  "branch_pr": {
+    "number": 7,
+    "open": true,
+    "merged": false,
+    "closed": false,
+    "human_approved": true,
+    "attestation": "approve",
+    "mine": true
+  },
+  "open_lane_prs": [
+    {
+      "number": 7,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": true,
+      "attestation": "approve",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "unknown-branch",
+    "step": {
+      "kind": "ExplainUnknown",
+      "why": "BranchUnknown"
+    },
+    "open_lanes": [
+      7
+    ]
+  }
+}

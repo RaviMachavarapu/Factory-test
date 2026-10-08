@@ -1,0 +1,22 @@
+{
+  "about": "State table, regulated phase/spec-<slug>: nothing present derives brainstorm.",
+  "branch": {
+    "kind": "PhaseSpec",
+    "slug": "habit-tracker"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "spec",
+    "phase": "brainstorm",
+    "step": {
+      "kind": "RunBrainstorm"
+    },
+    "open_lanes": []
+  }
+}

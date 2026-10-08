@@ -1,0 +1,36 @@
+{
+  "about": "A prior medium re-listed as low, reclassified by a second reviewer with a rationale: rule 4 satisfied.",
+  "review": [
+    {
+      "id": "SEC-001",
+      "severity": "low",
+      "cvss_vector": "@low"
+    }
+  ],
+  "disposition": [
+    {
+      "id": "SEC-001",
+      "status": "accepted",
+      "owner": "alice",
+      "expiry": null,
+      "rationale": "reviewed and downgraded",
+      "reclassified_by": "bob"
+    }
+  ],
+  "prior": [
+    {
+      "id": "SEC-001",
+      "severity": "medium",
+      "status": "accepted",
+      "expiry": "2026-10-27",
+      "version": "1.0.0"
+    }
+  ],
+  "medium_cap": 5,
+  "expiry_horizon_days": 180,
+  "run_date": "2026-09-27",
+  "expect": {
+    "passed": true,
+    "violations": []
+  }
+}

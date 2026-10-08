@@ -1,0 +1,29 @@
+{
+  "about": "The factory's own history: impl/plan-1a-first-run parses as Impl(1a, first-run).",
+  "branch": {
+    "kind": "Impl",
+    "plan": "1a",
+    "name": "first-run"
+  },
+  "branch_name": "impl/plan-1a-first-run",
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "impl",
+    "phase": "implement",
+    "step": {
+      "kind": "RunImplement",
+      "target": {
+        "kind": "PlanTarget",
+        "plan": "1a",
+        "name": "first-run"
+      }
+    },
+    "open_lanes": []
+  }
+}

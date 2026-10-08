@@ -1,0 +1,18 @@
+# osv-scanner config for a tauri-stack instance (REQ-303/304). Each entry
+# below cites a SEC-NNN in docs/security/0.0.0-skeleton-disposition.md, which
+# init copies into every tauri instance (REQ-388); the instance's first
+# /security-review carries them forward.
+#
+# Enumerated with osv-scanner 2.6.0 on 2026-09-25 and re-enumerated on 2026-10-02 (5871b662…); after the
+# 2026-10-04 re-pin (patch/pin-bump-2026-11) re-enumerated with osv-scanner 2.6.0 on 2026-10-04 against package-lock.json sha256 295d0757da494b4b493306995f6e43aa283f0c18f5167f7cd1803db115ddbc6f and src-tauri/Cargo.lock sha256 21b14f9e7b5adc3422fcb8eeb0dae5dabd7477d033d42d6f437ba9c4a21405c5
+# — SEC-003's five unic-* ids are gone (urlpattern 0.6.0 no longer pulls the family), so their ignores are dropped;
+# SEC-001 and SEC-002 remain and are renewed to 2027-03-24.
+[[IgnoredVulns]]
+id = "GHSA-wrw7-89jp-8q8g"
+ignoreUntil = 2027-03-24
+reason = "SEC-001: glib, unsound API (RUSTSEC-2024-0429, whose GHSA alias this is; osv-scanner filters the alias group by this id and reports a separate RUSTSEC-2024-0429 ignore unused); comes in via the gtk-rs GTK3 bindings, a Linux-only dependency of tauri's wry backend, not compiled for macOS"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0370"
+ignoreUntil = 2027-03-24
+reason = "SEC-002: proc-macro-error, unmaintained; comes in via gtk3-macros, a Linux-only build of tauri's wry backend (webkit2gtk/gtk), never compiled on macOS"

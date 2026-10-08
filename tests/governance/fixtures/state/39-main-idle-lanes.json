@@ -1,0 +1,24 @@
+{
+  "about": "Precedence 3: nothing to do on lanes proposes design/<slug> (PathClosure).",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "idle",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeDesign"
+      }
+    },
+    "open_lanes": []
+  }
+}

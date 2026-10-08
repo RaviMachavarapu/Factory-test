@@ -1,0 +1,36 @@
+{
+  "about": "R6: on the regulated path the unbuilt section is proposed as impl/plan-N-<slug>.",
+  "branch": {
+    "kind": "Main"
+  },
+  "branch_pr": null,
+  "open_lane_prs": [],
+  "facts": {
+    "pr_state_known": true,
+    "unbuilt": [
+      [
+        "a",
+        2
+      ],
+      [
+        "b",
+        1
+      ]
+    ]
+  },
+  "path": "regulated",
+  "solo": true,
+  "expect": {
+    "lane": "none",
+    "phase": "next-build",
+    "step": {
+      "kind": "NewBranch",
+      "proposal": {
+        "kind": "ProposeImpl",
+        "slug": "a",
+        "n": 2
+      }
+    },
+    "open_lanes": []
+  }
+}

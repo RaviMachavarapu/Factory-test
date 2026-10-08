@@ -1,0 +1,66 @@
+name: App stacks (macOS)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1" # weekly, Monday 06:00 UTC
+  pull_request:
+    paths:
+      - stacks/tauri/**
+      - stacks/flutter/**
+      - .github/workflows/app-stacks.yml
+
+permissions:
+  contents: read
+
+jobs:
+  first-run:
+    name: "First run (${{ matrix.app }}, macos-15)"
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [tauri, flutter]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set CARGO_TARGET_DIR
+        run: echo "CARGO_TARGET_DIR=${{ runner.temp }}/first-run-target" >> "$GITHUB_ENV"
+
+      - name: Tauri toolchain
+        if: matrix.app == 'tauri'
+        uses: ./stacks/tauri
+        with:
+          rust_cache: "false"
+
+      - name: Cache cargo registry and target dir (tauri)
+        if: matrix.app == 'tauri'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.npm
+            ${{ env.CARGO_TARGET_DIR }}
+          key: ${{ runner.os }}-tauri-${{ hashFiles('stacks/tauri/pack.yml', 'stacks/tauri/overlay/src-tauri/Cargo.lock', 'stacks/tauri/overlay/package-lock.json') }}
+
+      - name: Flutter toolchain
+        if: matrix.app == 'flutter'
+        uses: ./stacks/flutter
+
+      - name: Cache pub packages (flutter)
+        if: matrix.app == 'flutter'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-flutter-${{ hashFiles('stacks/flutter/overlay/pubspec.lock') }}
+
+      - name: First run
+        env:
+          SPECFLOW_FIRST_RUN: "1"
+          FIRST_RUN_CASES: ${{ matrix.app }}
+        run: bash tests/governance/test_first_run.sh

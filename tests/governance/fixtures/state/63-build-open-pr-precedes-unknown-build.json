@@ -1,0 +1,47 @@
+{
+  "about": "R5(f) ordering: an open PR on build/<slug>-2 (not a section) still reports its substate, checked before unknown-build.",
+  "branch": {
+    "kind": "Build",
+    "slug": "habit-tracker",
+    "n": 2
+  },
+  "branch_pr": {
+    "number": 7,
+    "open": true,
+    "merged": false,
+    "closed": false,
+    "human_approved": false,
+    "attestation": "none",
+    "mine": true
+  },
+  "open_lane_prs": [
+    {
+      "number": 7,
+      "open": true,
+      "merged": false,
+      "closed": false,
+      "human_approved": false,
+      "attestation": "none",
+      "mine": true
+    }
+  ],
+  "facts": {
+    "pr_state_known": true,
+    "build_sections": [
+      1
+    ]
+  },
+  "path": "lanes",
+  "solo": true,
+  "expect": {
+    "lane": "build",
+    "phase": "awaiting-verifier",
+    "step": {
+      "kind": "RunVerifier",
+      "pr": 7
+    },
+    "open_lanes": [
+      7
+    ]
+  }
+}
