@@ -315,7 +315,7 @@ jobs:
         if: needs.verify.outputs.stack == 'template'
         run: bash scripts/release-smoke.sh --stack template --dist "$RUNNER_TEMP/dist"
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-source
           path: ${{ runner.temp }}/dist
@@ -348,7 +348,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-source
           path: ${{ runner.temp }}/dist
@@ -405,7 +405,7 @@ jobs:
           source-url: ${{ steps.names.outputs.source }}
           prior: ${{ steps.prior.outputs.prior }}
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-image
           path: ${{ runner.temp }}/dist/image.json
@@ -442,7 +442,7 @@ jobs:
           tag: v${{ needs.verify.outputs.version }}
           dist: ${{ runner.temp }}/bundle
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/bundle
@@ -507,7 +507,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/bundle
@@ -566,7 +566,7 @@ jobs:
           security delete-keychain "$RUNNER_TEMP/release-signing.keychain-db" || true
           rm -f "$RUNNER_TEMP/release-signing.p12"
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-bundle-signed
           path: ${{ runner.temp }}/bundle
@@ -596,7 +596,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundle-signed
           path: ${{ runner.temp }}/bundle
@@ -623,25 +623,25 @@ jobs:
           ref: ${{ needs.verify.outputs.commit }}
           persist-credentials: false
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.build-source.result == 'success'
         with:
           name: release-source
           path: ${{ runner.temp }}/parts/source
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.image.result == 'success'
         with:
           name: release-image
           path: ${{ runner.temp }}/parts/image
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.bundle.result == 'success'
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/parts/bundle-unsigned
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.verify-signed.result == 'success'
         with:
           name: release-bundle-signed
