@@ -7,10 +7,10 @@ pytest-cov>=7.1,<8
 # python-stack instance passes the gate init-project.sh generates. Upper-bounded
 # so gate pass/fail stays reproducible (a future minor could add rules/reformat).
 # Enforced by tests/governance/test_python_lint_format.sh.
-ruff>=0.16.10,<0.17
-black>=26.3.1,<27
+ruff>=0.17.2,<0.18
+black>=26.10.1,<27
 # build/setuptools/wheel: needed to run the python stack pack's release.sh
 # (scripts/release-stack.sh.template contract; RELEASE hook, python -m build).
 build>=1.2,<2
-setuptools>=69
+setuptools>=84.2.1
 wheel>=0.43
