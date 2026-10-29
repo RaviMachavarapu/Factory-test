@@ -285,7 +285,7 @@ jobs:
           fi
           echo "python_version=$py" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ steps.pack.outputs.python_version }}
 
@@ -315,7 +315,7 @@ jobs:
         if: needs.verify.outputs.stack == 'template'
         run: bash scripts/release-smoke.sh --stack template --dist "$RUNNER_TEMP/dist"
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-source
           path: ${{ runner.temp }}/dist
@@ -348,7 +348,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-source
           path: ${{ runner.temp }}/dist
@@ -388,7 +388,7 @@ jobs:
           source-url: ${{ steps.names.outputs.source }}
 
       # The registry's first use, after the build and the smoke.
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -405,7 +405,7 @@ jobs:
           source-url: ${{ steps.names.outputs.source }}
           prior: ${{ steps.prior.outputs.prior }}
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-image
           path: ${{ runner.temp }}/dist/image.json
@@ -442,7 +442,7 @@ jobs:
           tag: v${{ needs.verify.outputs.version }}
           dist: ${{ runner.temp }}/bundle
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/bundle
@@ -507,7 +507,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/bundle
@@ -566,7 +566,7 @@ jobs:
           security delete-keychain "$RUNNER_TEMP/release-signing.keychain-db" || true
           rm -f "$RUNNER_TEMP/release-signing.p12"
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-bundle-signed
           path: ${{ runner.temp }}/bundle
@@ -596,7 +596,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-bundle-signed
           path: ${{ runner.temp }}/bundle
@@ -623,25 +623,25 @@ jobs:
           ref: ${{ needs.verify.outputs.commit }}
           persist-credentials: false
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.build-source.result == 'success'
         with:
           name: release-source
           path: ${{ runner.temp }}/parts/source
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.image.result == 'success'
         with:
           name: release-image
           path: ${{ runner.temp }}/parts/image
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.bundle.result == 'success'
         with:
           name: release-bundle-unsigned
           path: ${{ runner.temp }}/parts/bundle-unsigned
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: needs.verify-signed.result == 'success'
         with:
           name: release-bundle-signed
